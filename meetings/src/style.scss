@@ -1,0 +1,634 @@
+@import url("https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300");
+@import url("https://fonts.googleapis.com/css?family=Poppins");
+@import url("https://fonts.googleapis.com/css?family=Arimo");
+@import url("https://fonts.googleapis.com/css?family=Libre+Baskerville");
+@import url("https://fonts.googleapis.com/css?family=Playfair+Display");
+
+* {
+  margin: 0px;
+  padding: 0px;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+input,
+label,
+select,
+button,
+textarea {
+  margin: 0;
+  border: 0;
+  padding: 0;
+  display: inline-block;
+  vertical-align: middle;
+  white-space: normal;
+  // background:none;
+  line-height: 1;
+  font-family: "Poppins";
+}
+input[type="date"]::-webkit-calendar-picker-indicator {
+  color: rgba(0, 0, 0, 0);
+  opacity: 1;
+  display: block;
+  background: url(http://tiny.cc/6s0i5y) no-repeat;
+  width: 20px;
+  height: 20px;
+  border-width: thin;
+}
+.header {
+  font-family: "Playfair Display", "Libre Baskerville", "Arimo",
+    "Open Sans Condensed", sans-serif;
+  font-size: 28px;
+}
+
+.main {
+  position: relative;
+  background-color: #1772c3;
+  height: 645px;
+}
+.main__vertical-line {
+  position: absolute;
+  left: 365px;
+  top: 4.3%;
+  border-left: 2px solid #06447c;
+  height: 617px;
+  z-index: 1;
+}
+.main__time-now {
+  display: inline-block;
+  position: absolute;
+  left: 457px;
+  top: 2.5%;
+  width: 49px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
+  background-color: #06447c;
+  border-radius: 100px;
+  color: white;
+  font-family: "Poppins", sans-serif;
+  font-size: 13px;
+  color: #ffffff;
+  letter-spacing: 0.4px;
+  z-index: 2;
+}
+.header {
+  position: relative;
+  height: 71px;
+}
+
+.header__gp-icon {
+  position: relative;
+  top: 10px;
+  left: 10px;
+}
+
+.header__text {
+  display: inline-block;
+  position: absolute;
+  left: 74.6px;
+  bottom: 21.6px;
+  // line-height: 28px;
+}
+progress[value]::-webkit-progress-bar {
+  background-color: white;
+  // border-radius: 40px;
+}
+
+progress[value]::-webkit-progress-value {
+  // border-radius: 40px;
+  background-color: #06447c;
+}
+.date-picker__button {
+  // position: relative;
+  width: 24px;
+  height: 24px;
+  background: #e9ecef;
+  border-radius: 100px;
+  border: none;
+  & ~ & {
+    margin-left: 11.6%;
+  }
+}
+.date-picker__date-today {
+  display: inline-block;
+  position: absolute;
+  top: 1px;
+  left: 34%;
+}
+span {
+  color: white;
+}
+span + span {
+  margin-left: 26px;
+}
+.date-picker__date {
+  position: relative;
+  top: 11px;
+  left: 24px;
+}
+.date-picker__hours {
+  display: inline-block;
+  position: absolute;
+  top: 17px;
+  left: 22.2%;
+}
+.date-picker__hour {
+  display: inline-block;
+  width: 49px;
+  height: 13px;
+  text-align: center;
+  font-size: 13px;
+  letter-spacing: 0.4px;
+  font-family: "Poppins", sans-serif;
+}
+progress {
+  border: 0;
+  width: 75px;
+  height: 28px;
+  // border-radius: 20px;
+}
+// progress::-webkit-progress-bar {
+//     border: 0;
+//     height: 40px;
+//     border-radius: 20px;
+//     // background-color: black;
+// }
+// progress::-webkit-progress-value {
+//     border: 0;
+//     height: 40px;
+//     border-radius: 20px;
+//     background-color: black;
+// }
+// progress::-moz-progress-bar {
+//     border: 0;
+//     height: 40px;
+//     border-radius: 20px;
+//     // background-color: black;
+// }
+.header__button-create-meeting {
+  position: absolute;
+  top: 18px;
+  right: 24px;
+  display: inline-block;
+
+  width: 140px;
+  height: 36px;
+  border-radius: 4px;
+  border: none;
+
+  font-family: "Poppins", sans-serif;
+  font-size: 13px;
+  color: #ffffff;
+  letter-spacing: 0;
+
+  // margin: 30px auto;
+  // padding: 0;
+  // overflow: hidden;
+
+  border-width: 0;
+  outline: none;
+  border-radius: 4px;
+
+  background: #266dc2;
+  box-shadow: 0 10px 10px -10px #266dc2;
+  // box-shadow: 0 1px 4px rgba(0, 0, 0, .6);
+
+  transition: background-color 0.3s;
+}
+
+.header__button-create-meeting:hover,
+.header__button-create-meeting:focus {
+  background-color: #0859a1;
+}
+
+// .header__button-create-meeting > * {
+//   position: relative;
+// }
+
+.header__button-create-meeting:before {
+  content: "";
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  display: block;
+  width: 0;
+  padding-top: 0;
+
+  border-radius: 100%;
+
+  background-color: rgba(236, 240, 241, 0.3);
+
+  -webkit-transform: translate(-50%, -50%);
+  -moz-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  -o-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.header__button-create-meeting:active:before {
+  width: 120%;
+  padding-top: 120%;
+
+  transition: width 0.2s ease-out, padding-top 0.2s ease-out;
+}
+
+.main__date-picker {
+  position: relative;
+  height: 46px;
+  border-bottom: 1px solid white; //
+  background-color: #1772c3;
+}
+.date-picker__right-arrow {
+  position: absolute;
+  top: 18px;
+  left: 15.4%;
+  z-index: 1;
+}
+.date-picker__left-arrow {
+  position: absolute;
+  top: 18px;
+  left: 2%;
+  z-index: 1;
+}
+.main__meeting-rooms {
+  display: inline-block;
+  position: absolute;
+  width: 19.1%;
+  height: 645px;
+  border-right: 1px solid white;
+  line-height: 17px;
+  color: white;
+  font-family: "Poppins", sans-serif;
+  font-weight: bold;
+  ul {
+    list-style: none;
+    margin-left: 20px;
+    p + p {
+      margin-top: 2px;
+      font-size: 13px;
+      font-weight: normal;
+    }
+    li + li {
+      margin-top: 16px;
+    }
+  }
+}
+.main__new-meet-create {
+  display: block;
+  position: absolute;
+  z-index: 999;
+  width: 100%;
+  height: 691px;
+  color: white;
+  font-family: "Poppins";
+  // font-size: 16px;
+  background-color: #1772c3;
+  label {
+    display: block;
+    position: absolute;
+  }
+  input {
+    padding-left: 10px;
+  }
+}
+.new-meet-create__text {
+  position: absolute;
+  left: 204px;
+  top: 103px;
+  width: 212px;
+  height: 24px;
+  font-size: 20px;
+}
+.new-meet-create__meet-title {
+  position: absolute;
+  left: 204px;
+  top: 167px;
+  width: 420px;
+  height: 38px;
+  border-radius: 4px;
+}
+.new-meet-create__meet-date {
+  position: absolute;
+  left: 656px;
+  top: 167px;
+  width: 238px;
+  height: 38px;
+  border-radius: 4px;
+}
+.new-meet-create__meet-people {
+  position: absolute;
+  left: 204px;
+  top: 249px;
+  width: 420px;
+  height: 38px;
+  border-radius: 4px;
+}
+#image-dropdown {
+  position: relative;
+  /*style the "box" in its minimzed state*/
+  border: 1px solid black;
+  width: 200px;
+  height: 50px;
+  overflow: hidden;
+  /*animate collapsing the dropdown from open to closed state (v. fast)*/
+  -moz-transition: height 0.1s;
+  -webkit-transition: height 0.1s;
+  -ms-transition: height 0.1s;
+  -o-transition: height 0.1s;
+  transition: height 0.1s;
+
+  label {
+    display: none;
+    margin: 2px;
+    height: 46px;
+    opacity: 0.2;
+    width: 100px;
+    /*setting correct backgrounds - add additional rules with selectors based on "for" attribute, something like label[for=line2]{background-image:...}*/
+    background: url('http://www.google.com/images/srpr/logo3w.png') 50% 50%;
+  }
+}
+.label2 {
+  background: url('http://www.google.com/images/srpr/logo3w.png') 50% 50%;
+}
+#image-dropdown:hover {
+  /*when expanded, the dropdown will get native means of scrolling*/
+  height: 200px;
+  overflow-y: scroll;
+  /*nice and smooth expand - speed this up at your preference or remove animation altogether*/
+  -moz-transition: height 0.5s;
+  -webkit-transition: height 0.5s;
+  -ms-transition: height 0.5s;
+  -o-transition: height 0.5s;
+  transition: height 0.5s;
+}
+#image-dropdown input {
+  /*hide the nasty default radio buttons. like, completely!*/
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+}
+
+// #image-dropdown label {
+//   /*style the labels to look like dropdown options, kinda*/
+//   // display: inline-block;
+//   margin: 2px;
+//   height: 46px;
+//   opacity: 0.2;
+//   width: 100px;
+//   /*setting correct backgrounds - add additional rules with selectors based on "for" attribute, something like label[for=line2]{background-image:...}*/
+//   background: url('http://www.google.com/images/srpr/logo3w.png') 50% 50%;
+// }
+#image-dropdown:hover label {
+  /*this is how labels render in the "expanded" state. we want to see only the selected radio button in the collapsed menu, and all of them when expanded*/
+  display: block;
+}
+#image-dropdown label:hover {
+  opacity: 0.5;
+}
+#image-dropdown input:checked + label {
+  /*tricky! labels immediately following a checked radio button (with our markup they are semantically related) should be fully opaque regardless of hover, and they should always be visible (i.e. even in the collapsed menu*/
+  opacity: 1 !important;
+  display: block;
+}
+.new-meet-create__meet-people-label {
+  position: absolute;
+  left: 204px;
+  top: 225px;
+}
+.new-meet-create__meet-people-list {
+  overflow-y: scroll;
+  position: absolute;
+  left: 204px;
+  top: 249px;
+  width: 420px;
+  height: 218px;
+  padding-bottom: 5px;
+  background: #FFFFFF;
+  color: #000;
+  box-shadow: 0 1px 10px 0 rgba(0,44,92,0.28);
+  list-style: none;
+  z-index: 1;
+  span {
+    // font-size: 13px;
+    color: grey;
+    letter-spacing: 0;
+    line-height: 15px;
+  }
+  li:first-child {
+    padding-top: 5px;
+  }
+  li {
+    padding-left: 16px;
+    padding-top: 5px;
+  }
+  .meet-people-list__avatar {
+    position: relative;
+    margin-right: 8px;
+    // display: none;
+    border-radius: 50%;
+    top: 7px;
+  }
+  .meet-people-list__hint {
+    text-align: center;
+    font-size: 14px;
+    background: #E9ECEF;
+    line-height: 10px;
+    height: 18px;
+    padding-right: 15px;
+  }
+}
+.new-meet-create__recommended-meeting-rooms-text {
+  position: absolute;
+  left: 660px;
+  top: 225px;
+}
+.new-meet-create__meet-room {
+  position: absolute;
+  left: 660px;
+  top: 250px;
+  width: 420px;
+  height: 37px;
+  line-height: 37px;
+  padding-left: 10px;
+  border-radius: 4px;
+  background: #bdc3c7;
+  color: #000;
+}
+.new-meet-create__time {
+  position: relative;
+  left: 910px;
+  top: 167px;
+  border-radius: 4px;
+  width: 72px;
+  height: 38px;
+  padding-left: 5px !important;
+  & ~ & {
+    margin-left: 22px;
+  }
+
+  // font-size: 12px;
+}
+.new-meet-create__label-theme {
+  position: absolute;
+  display: block;
+  left: 204px;
+  top: 147px;
+  & ~ & {
+    margin-left: 50px;
+  }
+}
+.new-meet-create__label-date {
+  position: absolute;
+  display: block;
+  left: 656px;
+  top: 147px;
+}
+.new-meet-create__label-date-begin {
+  position: absolute;
+  display: block;
+  left: 911px;
+  top: 147px;
+}
+.new-meet-create__label-date-end {
+  position: absolute;
+  display: block;
+  left: 1004px;
+  top: 147px;
+}
+.new-meet-create__hint {
+  position: absolute;
+  width: 420px;
+  // width: 100%;
+  height: 70px;
+  line-height: 24px;
+  text-align: center;
+  top: 467px;
+  border-radius: 4px;
+  left: 204px;
+  z-index: 999;
+  color: black;
+  background: white;
+
+}
+.new-meet-create__hint-text {
+  background: #E9ECEF;
+}
+.invated-people {
+  position: absolute;
+  left: 204px;
+  top: 299px;
+  width: 420px;
+  height: 400px;
+}
+.invated-people__participant {
+  position: relative;
+  margin-left: 20px;
+  display: inline-block;
+}
+.meeting-rooms__floor {
+  margin-top: 22px; // 24 to next
+  margin-left: 20px;
+  margin-bottom: 8px;
+  font-size: 11px;
+}
+
+.meeting-schedule {
+  position: absolute;
+  padding-top: 47px;
+  right: 0px;
+  width: 80.9%;
+  height: 645px;
+  display: grid;
+  overflow-x: scroll;
+  grid-template-columns: repeat(17, minmax(75px, 75px));
+  // grid-template-columns: repeat(13, 50px);
+  // grid-template-rows: repeat(8, 28px);
+  grid-template-rows: 24px 24px 24px 53px 24px 24px 24px 24px;
+  grid-gap: 24px 1px;
+  // div.line:nth-child(2n+1) {
+  //   margin-top: 10px;
+  // }
+}
+.meeting-schedule__popup {
+  // visibility: hidden;
+  width: 360px;
+  height: 180px;
+  background-color: crimson;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 8px 0;
+  position: absolute;
+  z-index: 1;
+  // -webkit-animation: fadeIn 1s;
+  animation: fadeIn 1s;
+  // left: 50%;
+  // margin-left: -80px;
+}
+.popup__close-button {
+  position: absolute;
+  left: 340px;
+  top: 10px;
+}
+.poput__input-meet-name {
+  display: block;
+  margin: auto;
+  position: relative;
+  top: 20px;
+  width: 200px;
+  box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.1);
+  border: 0;
+  outline: 0;
+  font-family: "Poppins";
+  // background-image:none;
+  // background-color:transparent;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  & + & {
+    margin-top: 20px;
+  }
+}
+@-webkit-keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.box {
+  background-color: white;
+}
+.box__plus-h {
+  // display: none;
+  position: relative;
+  bottom: 24.5px;
+  height: 12px;
+  width: 12px;
+  margin: auto;
+  border-bottom: 3px solid white;
+}
+.box__plus-v {
+  // display: none;
+  position: relative;
+  bottom: 31.70px;
+  left: 4.5px;
+  height: 12px;
+  width: 12px;
+  margin: auto;
+  border-left: 3px solid white;
+}
