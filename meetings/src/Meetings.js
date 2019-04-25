@@ -12,7 +12,22 @@ class Meetings extends Component {
     isOver: false,
     timeNow: new Date(),
     isHiddenPopup: false,
-    newMeetWindowShown: false // change to false
+    newMeetWindowShown: false, // change to false
+    lastClickedTimeBlock: 'none',
+    meetingRoomIsSelected: false,
+    meetingRoom: '',
+    meetingRooms: {
+      0: 'Lomonosov',
+      1: 'Pavlov',
+      2: 'Kapitza',
+      3: 'Tamm',
+      4: 'Mendeleev',
+      5: 'Perelman',
+      6: 'Lobachevsky',
+      7: 'Landau'
+    },
+    timeBlocks: new Array(137),
+    moreInfoPopup: false
   };
   componentDidMount() {
     document.addEventListener("mouseup", () => {
@@ -39,15 +54,29 @@ class Meetings extends Component {
       timeNow: new Date()
     });
   }
-  newMeetCreate() {
-    this.setState({newMeetWindowShown: !this.state.newMeetWindowShown});
+  newMeetCreate = () => {
+    this.setState({newMeetWindowShown: !this.state.newMeetWindowShown, meetingRoomIsSelected: false});
+  }
+  createMeetHandler = () => {
+    document.querySelector(".plus" + this.state.lastClickedTimeBlock).style.display = "block";
+    document.querySelector(".plus" + this.state.lastClickedTimeBlock).style.backgroundColor = "cyan";
+    document.querySelector(".horizontal" + this.state.lastClickedTimeBlock).style.display = "none";
+    document.querySelector(".vertical" + this.state.lastClickedTimeBlock).style.display = "none";
+    document.querySelector(".number" + this.state.lastClickedTimeBlock).value = 0;
+
+    let copyTimeBlocks = [...this.state.timeBlocks];
+    copyTimeBlocks[this.state.lastClickedTimeBlock] = true;
+    this.setState({timeBlocks: copyTimeBlocks,lastClickedTimeBlock: 'none'});
+  }
+  advancedSettingsOnClick() {
+    this.setState({newMeetWindowShown: !this.state.newMeetWindowShown, meetingRoomIsSelected: true, isHiddenPopup: false});
   }
   mouseDownHandler(e, i) {
     console.log(this.state.isClicked);
     if (this.state.isClicked) {
       let rect = e.target.getBoundingClientRect();
       // console.log(' progrss click : ', (e.clientX - rect.left)/0.75, i , '.number' + `${i}` );
-      let el = document.querySelector(".number" + `${i}`);
+      let el = document.querySelector(".number" + i);
       el.style.backgroundColor = "cyan";
       el.value = Math.round((e.clientX - rect.left) / 0.75);
       // console.log(' handler event pageX :', e.pageX, e.pageY, e.clientX);
@@ -57,6 +86,11 @@ class Meetings extends Component {
       /*this.setState({isClicked: false});*/
     }
   }
+  timeBlockClick = (e, i) => {
+    console.log(' i : ', i);
+    this.setState({moreInfoPopup: true});
+
+  }
   onClick(e, i) {
     // if (this.state.isOver)
     // let rect = e.target.getBoundingClientRect();
@@ -64,8 +98,16 @@ class Meetings extends Component {
     // let el = document.querySelector('.number' + `${i}`);
     // el.value = Math.round( (e.clientX - rect.left)/0.75 ); // 0.75 width of progress element
     let q = document.querySelector.bind(document);
+    console.log('i : ', i, this.state.meetingRooms[Math.ceil(i/17)], this.state.meetingRooms[0] );
+    this.setState({meetingRoom: this.state.meetingRooms[Math.ceil(i/17)]}); // find meeting room by clicking on time block
 
-    q(".plus" + `${i}`).style.display = "block";
+    if (this.state.lastClickedTimeBlock !== 'none') { // remove plus icon and backgroundColor from last clicked time block and add it to current clicked time block
+      q(".plus" + this.state.lastClickedTimeBlock).style.display = "none";
+      q(".number" + this.state.lastClickedTimeBlock).value = 0;
+    }
+    q(".plus" + i).style.display = "block";
+    this.setState({lastClickedTimeBlock: i});
+
     if (this.state.isHiddenPopup) {
       this.setState({ isHiddenPopup: false });
       let offsetLeft = e.clientX - q(".main__meeting-rooms").offsetWidth,
@@ -74,14 +116,14 @@ class Meetings extends Component {
           q(".header").offsetHeight -
           q(".main__date-picker").offsetHeight;
       setTimeout(() => {
-        q(".number" + `${i}`).value = 100;
+        q(".number" + i).value = 100;
         this.setState({ isClicked: true, isHiddenPopup: true });
         // let rect = e.target.getBoundingClientRect();
         q(".meeting-schedule__popup").style.left = offsetLeft + "px";
         q(".meeting-schedule__popup").style.top = offsetTop + "px";
       }, 7);
     } else {
-      q(".number" + `${i}`).value = 100;
+      q(".number" + i).value = 100;
       this.setState({ isClicked: true, isHiddenPopup: true });
       // let rect = e.target.getBoundingClientRect();
       let offsetLeft = e.clientX - q(".main__meeting-rooms").offsetWidth,
@@ -128,7 +170,7 @@ class Meetings extends Component {
         </header>
         <div className="main">
           {this.state.newMeetWindowShown &&
-          <CreateNewMeetField />}
+          <CreateNewMeetField createMeetHandler={this.createMeetHandler} newMeetCreate={this.newMeetCreate} meetingRoomIsSelected={this.state.meetingRoomIsSelected} meetingRoom={this.state.meetingRoom} />}
           <div className="main__time-now">
             {this.state.timeNow.toTimeString().slice(0, 5)}
           </div>
@@ -202,6 +244,8 @@ class Meetings extends Component {
                   <input className="poput__input-meet-name" type="text" placeholder="Meet name"/>
                   <input className="poput__input-meet-name" type="text" placeholder="date"/>
                   <input className="poput__input-meet-name" type="text" placeholder="Guests"/>
+                  <span className="popup__advanced-settings" onClick={() => this.advancedSettingsOnClick()} >advanced settings</span>
+                  <button className="popup__advanced-confirm">confirm</button>
                 </div>
               )}
             </CSSTransitionGroup>
@@ -211,16 +255,16 @@ class Meetings extends Component {
                 <progress
                   value="0"
                   max="100"
-                  className={"box " + "number" + `${i}`}
+                  className={"box number" + i}
                   onMouseMove={e => this.mouseDownHandler(e, i)}
                   onMouseDown={e => this.onClick(e, i)}
                   onMouseUp={() => this.isClickedFalse()}
                   onDragStart={e => this.preventDefault(e)}
                   onMouseOver={() => this.mouseOver()}
                 />
-                <div className={"plus" + `${i}`} style={{display: 'none'}} >
-                  <div className="box__plus-h"></div>
-                  <div className="box__plus-v"></div>
+                <div className={"plus-box plus" + i} onClick={e => this.timeBlockClick(e, i)} >
+                  <div className={"box__plus-h horizontal" + i}></div>
+                  <div className={"box__plus-v vertical" + i}></div>
                 </div>
               </div>
             ))}

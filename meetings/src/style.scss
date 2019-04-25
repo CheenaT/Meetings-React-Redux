@@ -294,6 +294,30 @@ progress {
     padding-left: 10px;
   }
 }
+.new-meet-create__back-button {
+  position: absolute;
+  top: 331px;
+  left: 876px;
+  width: 72px;
+  height: 38px;
+  background-color: #0859A1;
+  color: white;
+  text-align: center;
+  border-radius: 4px;
+  z-index: 1000;
+}
+.new-meet-create__create-button {
+  position: absolute;
+  top: 331px;
+  left: 970px;
+  width: 110px;
+  height: 38px;
+  border-radius: 4px;
+  color: white;
+  text-align: center;
+  z-index: 1000;
+  background-color: #0859A1;
+}
 .new-meet-create__text {
   position: absolute;
   left: 204px;
@@ -313,7 +337,7 @@ progress {
 .new-meet-create__meet-date {
   position: absolute;
   left: 656px;
-  top: 167px;
+  top: 144px;
   width: 238px;
   height: 38px;
   border-radius: 4px;
@@ -446,6 +470,18 @@ progress {
   left: 660px;
   top: 225px;
 }
+.new-meet-create__selected-meeting-room {
+  position: absolute;
+  left: 660px;
+  top: 250px;
+  width: 420px;
+  height: 37px;
+  line-height: 37px;
+  padding-left: 10px;
+  border-radius: 4px;
+  background: #00BACE; // mb #00D6AD or #0098D9
+  color: #000;
+}
 .new-meet-create__meet-room {
   position: absolute;
   left: 660px;
@@ -547,8 +583,8 @@ progress {
   grid-template-columns: repeat(17, minmax(75px, 75px));
   // grid-template-columns: repeat(13, 50px);
   // grid-template-rows: repeat(8, 28px);
-  grid-template-rows: 24px 24px 24px 53px 24px 24px 24px 24px;
-  grid-gap: 24px 1px;
+  grid-template-rows: 28px 28px 28px 58.8px 28px 28px 28px 28px;
+  grid-gap: 23.6px 1px;
   // div.line:nth-child(2n+1) {
   //   margin-top: 10px;
   // }
@@ -573,6 +609,26 @@ progress {
   position: absolute;
   left: 340px;
   top: 10px;
+}
+.popup__advanced-settings {
+  position: absolute;
+  bottom: 13px;
+  left: 80px;
+  color: black;
+  font-family: 'Poppins';
+  font-size: 13.3px;
+}
+.popup__advanced-confirm {
+  position: absolute;
+  border-radius: 3px;
+  background-color: #AD0728;
+  width: 120px;
+  height: 25px;
+  bottom: 10px;
+  right: 20px;
+  color: black;
+  font-family: 'Poppins';
+  font-size: 13.3px;
 }
 .poput__input-meet-name {
   display: block;
@@ -615,8 +671,9 @@ progress {
 }
 .box__plus-h {
   // display: none;
-  position: relative;
-  bottom: 24.5px;
+  position: absolute;
+  bottom: 12.5px;
+  left: 31.5px;
   height: 12px;
   width: 12px;
   margin: auto;
@@ -624,11 +681,20 @@ progress {
 }
 .box__plus-v {
   // display: none;
-  position: relative;
-  bottom: 31.70px;
-  left: 4.5px;
+  position: absolute;
+  bottom: 8px;
+  left: 36px;
   height: 12px;
   width: 12px;
   margin: auto;
   border-left: 3px solid white;
+}
+.plus-box {
+  display: none;
+  position: relative;
+  bottom: 29px;
+  width: 75px;
+  height: 28px;
+  // background: black;
+
 }

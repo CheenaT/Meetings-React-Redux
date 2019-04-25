@@ -1,5 +1,7 @@
 import React from "react";
 import Anakin from "./../../images/Anakin.jpg"
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const people = [{name: 'Lex'}, {name: 'Wayne'}];
 class CreateNewMeetField extends React.Component {
@@ -11,15 +13,23 @@ class CreateNewMeetField extends React.Component {
         ((+new Date().toTimeString().slice(3, 5) > 54 ? 1 : 0) + +new Date().toTimeString().slice(0, 2) ) +
         ":" + (+new Date().toTimeString().slice(3, 5) < 5 || +new Date().toTimeString().slice(3, 5) > 54 ? 0 : '' ) +
         (((((+new Date().toTimeString().slice(3, 5) + 5) / 5) | 0) * 5) % 60),
-      participantsListIsShown: false
+      participantsListIsShown: false,
+      startDate: new Date()
     };
 
+    this.handleChange = this.handleChange.bind(this);
     // this.onFirstTimeChange = this.onFirstTimeChange.bind(this);
+  }
+
+  handleChange(date) {
+    this.setState({
+      startDate: date
+    });
   }
 
   componentDidMount() {
     console.log(document.getElementById('meet-date'));
-    document.getElementById('meet-date').value = new Date().toJSON().slice(0,10);
+    // document.getElementById('meet-date').value = new Date().toJSON().slice(0,10);
   }
   onFirstTimeChange(e) {
     this.setState({ timeValue: e.target.value });
@@ -33,7 +43,10 @@ class CreateNewMeetField extends React.Component {
   render() {
     return (
       <div>
+        <button className="new-meet-create__back-button" onClick={this.props.newMeetCreate}>Back</button>
+        <button className="new-meet-create__create-button" onClick={() => { this.props.createMeetHandler(); this.props.newMeetCreate() } }>Create</button>
         <form action="" className="main__new-meet-create">
+
           <div className="new-meet-create__text">New meet</div>
           <label htmlFor="meet-title" className="new-meet-create__label-theme">
             Theme
@@ -47,10 +60,25 @@ class CreateNewMeetField extends React.Component {
           <label htmlFor="meet-date" className="new-meet-create__label-date">
             Date
           </label>
-          <input
-            type="date"
+          <DatePicker
+            selected={this.state.startDate}
+            onChange={this.handleChange}
             id="meet-date"
             className="new-meet-create__meet-date"
+            dateFormat="d MMMM yyyy"
+            timeCaption="time"
+            popperPlacement="top-end"
+            popperModifiers={{
+              offset: {
+                enabled: true,
+                offset: '50px, 100px'
+              },
+              preventOverflow: {
+                enabled: true,
+                escapeWithReference: false, // force popper to stay in viewport (even when input is scrolled out of view)
+                boundariesElement: 'viewport'
+              }
+            }}
           />
           <label htmlFor="meet-date" className="new-meet-create__label-date-begin">
             Begin
@@ -100,7 +128,19 @@ class CreateNewMeetField extends React.Component {
                 <li><img src={Anakin} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Ace Ventura</li>
                 <li><img src={Anakin} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Gabe Newell</li>
                 <li><img src={Anakin} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Yagami Light &bull; God of the new world, also known as justice</li>
-                <li><img src={Anakin} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Tony Stark</li>
+                <li><img src={Anakin} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Dalai Lama</li>
+                <li><img src={Anakin} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Eru Rōraito also known as L</li>
+                <li><img src={Anakin} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Erald Coil second most famous detective in the world </li>
+                <li><img src={Anakin} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Deneuve third most famous detective in the world </li>
+                <li><img src={Anakin} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>The Shinigami King (死神大王, Shinigami Daiō), also known as the King of Death, is the ruler of all Shinigami in the Shinigami Realm </li>
+                
+                <li><img src={Anakin} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Deneuve third most famous detective in the world </li>
+                <li><img src={Anakin} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Deneuve third most famous detective in the world </li>
+                <li><img src={Anakin} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Deneuve third most famous detective in the world </li>
+                <li><img src={Anakin} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Deneuve third most famous detective in the world </li>
+                <li><img src={Anakin} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Deneuve third most famous detective in the world </li>
+                <li><img src={Anakin} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>N'aix &bull; main damage dealer</li>
+                <li><img src={Anakin} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>X &bull; Lethal benefit dealer</li>
                 <li><img src={Anakin} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Tyler Durden second personality</li>
                 <li><img src={Anakin} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Ernest Hemingway<span> &bull; last floor</span></li>
               </ul>
@@ -133,10 +173,13 @@ class CreateNewMeetField extends React.Component {
             <input type="radio" id="line6" name="line-style" value="6"  /><label htmlFor="line6"></label>
             <input type="radio" id="line7" name="line-style" value="7"  /><label htmlFor="line7"></label>
           </div>*/}
-          <span className="new-meet-create__recommended-meeting-rooms-text">Recommended meeting room{true ? 's' : ''}</span>
-          <div className="new-meet-create__recommended-meeting-rooms">
-            <div className="new-meet-create__meet-room">Dark Tower</div>
-          </div>
+          <span className="new-meet-create__recommended-meeting-rooms-text">{this.props.meetingRoomIsSelected ? 'Meeting room' : 'Recommended meeting room' }{false ? 's' : ''}</span>
+          { this.props.meetingRoomIsSelected ?
+            <div className="new-meet-create__selected-meeting-room">{this.props.meetingRoom}</div> :
+            <div className="new-meet-create__recommended-meeting-rooms">
+              <div className="new-meet-create__meet-room">Dark Tower</div>
+            </div> }
+
           <div className="invated-people">
             {people.map( el => (<div className="invated-people__participant">{el.name}</div>))}
           </div>
