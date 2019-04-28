@@ -6,6 +6,10 @@ import CloseButton from "./images/close.svg";
 import { CSSTransitionGroup } from "react-transition-group";
 import CreateNewMeetField from "./Components/Create-New-Meet-Field"
 
+let q = document.querySelector.bind(document);
+
+
+
 class Meetings extends Component {
   state = {
     isClicked: false,
@@ -55,18 +59,21 @@ class Meetings extends Component {
     });
   }
   newMeetCreate = () => {
-    this.setState({newMeetWindowShown: !this.state.newMeetWindowShown, meetingRoomIsSelected: false});
+    this.setState({newMeetWindowShown: !this.state.newMeetWindowShown, meetingRoomIsSelected: false, meetingRoom: '' });
   }
   createMeetHandler = () => {
-    document.querySelector(".plus" + this.state.lastClickedTimeBlock).style.display = "block";
-    document.querySelector(".plus" + this.state.lastClickedTimeBlock).style.backgroundColor = "cyan";
-    document.querySelector(".horizontal" + this.state.lastClickedTimeBlock).style.display = "none";
-    document.querySelector(".vertical" + this.state.lastClickedTimeBlock).style.display = "none";
-    document.querySelector(".number" + this.state.lastClickedTimeBlock).value = 0;
 
-    let copyTimeBlocks = [...this.state.timeBlocks];
-    copyTimeBlocks[this.state.lastClickedTimeBlock] = true;
-    this.setState({timeBlocks: copyTimeBlocks,lastClickedTimeBlock: 'none'});
+    if ( this.state.lastClickedTimeBlock !== 'none') {
+      document.querySelector(".plus" + this.state.lastClickedTimeBlock).style.display = "block";
+      document.querySelector(".plus" + this.state.lastClickedTimeBlock).style.backgroundColor = "cyan";
+      document.querySelector(".horizontal" + this.state.lastClickedTimeBlock).style.display = "none";
+      document.querySelector(".vertical" + this.state.lastClickedTimeBlock).style.display = "none";
+      document.querySelector(".number" + this.state.lastClickedTimeBlock).value = 0;
+
+      let copyTimeBlocks = [...this.state.timeBlocks];
+      copyTimeBlocks[this.state.lastClickedTimeBlock] = true;
+      this.setState({timeBlocks: copyTimeBlocks,lastClickedTimeBlock: 'none'});
+    }
   }
   advancedSettingsOnClick() {
     this.setState({newMeetWindowShown: !this.state.newMeetWindowShown, meetingRoomIsSelected: true, isHiddenPopup: false});
@@ -86,10 +93,38 @@ class Meetings extends Component {
       /*this.setState({isClicked: false});*/
     }
   }
-  timeBlockClick = (e, i) => {
-    console.log(' i : ', i);
-    this.setState({moreInfoPopup: true});
+  showMoreInfoPopup = (e, i) => {
 
+    if( this.state.timeBlocks[i] ) {
+      if (this.state.moreInfoPopup) {
+        this.setState({ moreInfoPopup: false });
+        let offsetLeft = e.clientX - q(".main__meeting-rooms").offsetWidth,
+            offsetTop = e.clientY - q(".header").offsetHeight - q(".main__date-picker").offsetHeight;
+        console.log(' offsets : ', offsetLeft, offsetTop);
+        setTimeout(() => {
+          q(".number" + i).value = 100;
+          this.setState({moreInfoPopup: true});
+          // let rect = e.target.getBoundingClientRect();
+          q(".meeting-schedule__more-info-popup").style.left = offsetLeft + "px";
+          q(".meeting-schedule__more-info-popup").style.top = offsetTop + "px";
+        }, 10);
+      } else {
+        q(".number" + i).value = 100;
+          this.setState({moreInfoPopup: true});
+        // let rect = e.target.getBoundingClientRect();
+        let offsetLeft = e.clientX - q(".main__meeting-rooms").offsetWidth,
+            offsetTop = e.clientY - q(".header").offsetHeight - q(".main__date-picker").offsetHeight;
+        console.log(' offsets : ', offsetLeft, offsetTop);
+        setTimeout(() => {
+          q(".meeting-schedule__more-info-popup").style.left = offsetLeft + "px";
+          q(".meeting-schedule__more-info-popup").style.top = offsetTop + "px";
+        }, 0);
+      }
+    }
+  }
+  hideMoreInfoPopup = () => {
+    console.log('debug');
+    this.setState({moreInfoPopup: false});
   }
   onClick(e, i) {
     // if (this.state.isOver)
@@ -98,7 +133,7 @@ class Meetings extends Component {
     // let el = document.querySelector('.number' + `${i}`);
     // el.value = Math.round( (e.clientX - rect.left)/0.75 ); // 0.75 width of progress element
     let q = document.querySelector.bind(document);
-    console.log('i : ', i, this.state.meetingRooms[Math.ceil(i/17)], this.state.meetingRooms[0] );
+
     this.setState({meetingRoom: this.state.meetingRooms[Math.ceil(i/17)]}); // find meeting room by clicking on time block
 
     if (this.state.lastClickedTimeBlock !== 'none') { // remove plus icon and backgroundColor from last clicked time block and add it to current clicked time block
@@ -110,18 +145,21 @@ class Meetings extends Component {
 
     if (this.state.isHiddenPopup) {
       this.setState({ isHiddenPopup: false });
-      let offsetLeft = e.clientX - q(".main__meeting-rooms").offsetWidth,
+      let offsetLeft = Math.ceil((e.clientX - q(".main__meeting-rooms").offsetWidth) / 75)*75,
         offsetTop =
           e.clientY -
           q(".header").offsetHeight -
           q(".main__date-picker").offsetHeight;
+      offsetLeft = (offsetLeft + 360 + q(".main__meeting-rooms").offsetWidth) > window.innerWidth ? (Math.floor((e.clientX - q(".main__meeting-rooms").offsetWidth) / 75)*75 - 360 + ( (Math.floor((e.clientX - q(".main__meeting-rooms").offsetWidth) / 75) ) - 1 ) ) : offsetLeft;
+          console.log(" clientX ", e.clientY, e.clientX);
+          console.log(' offsets : ', offsetLeft, offsetTop, q(".main__meeting-rooms").offsetWidth, (Math.floor((e.clientX - q(".main__meeting-rooms").offsetWidth) / 75)*75 ));
       setTimeout(() => {
         q(".number" + i).value = 100;
         this.setState({ isClicked: true, isHiddenPopup: true });
         // let rect = e.target.getBoundingClientRect();
         q(".meeting-schedule__popup").style.left = offsetLeft + "px";
         q(".meeting-schedule__popup").style.top = offsetTop + "px";
-      }, 7);
+      }, 10);
     } else {
       q(".number" + i).value = 100;
       this.setState({ isClicked: true, isHiddenPopup: true });
@@ -132,6 +170,7 @@ class Meetings extends Component {
           q(".header").offsetHeight -
           q(".main__date-picker").offsetHeight;
       console.log(" clientX ", e.clientY, offsetTop);
+      console.log(' offsets : ', offsetLeft, offsetTop);
       setTimeout(() => {
         q(".meeting-schedule__popup").style.left = offsetLeft + "px";
         q(".meeting-schedule__popup").style.top = offsetTop + "px";
@@ -163,6 +202,7 @@ class Meetings extends Component {
             alt=""
           />
           <div className="header__text">Meetings</div>
+          {/*<input className="header__order-pass-if-forgot-someone"></input>*/}
           <button className="header__button-create-meeting" onClick={() => this.newMeetCreate()}>
             { this.state.newMeetWindowShown && 'cancel meet' }
             { !this.state.newMeetWindowShown && 'new meet' } {/*meeting*/}
@@ -200,34 +240,34 @@ class Meetings extends Component {
               </li>
               <li>
                 <p>Pavlov</p>
-                <p>up to 30 people</p>
+                <p>up to 20 people</p>
               </li>
               <li>
                 <p>Kapitza</p>
-                <p>up to 30 people</p>
+                <p>up to 20 people</p>
               </li>
               <li>
                 <p>Tamm 👉</p>
-                <p>up to 30 people</p>
+                <p>up to 10 people</p>
               </li>
             </ul>
             <p className="meeting-rooms__floor">4 floor</p>
             <ul>
               <li>
                 <p>Mendeleev</p>
-                <p>up to 30 people</p> {/* up to 30 mb */}
+                <p>from 4 to 8</p> {/* up to 30 mb */}
               </li>
               <li>
                 <p>Perelman</p>
-                <p>up to 30 people</p>
+                <p>from 4 to 8</p>
               </li>
               <li>
                 <p>Lobachevsky</p>
-                <p>up to 30 people</p>
+                <p>from 3 to 6</p>
               </li>
               <li>
                 <p>Landau</p>
-                <p>up to 30 people</p>
+                <p>from 3 to 6</p>
               </li>
             </ul>
           </div>
@@ -238,6 +278,14 @@ class Meetings extends Component {
               transitionEnterTimeout={500}
               transitionLeaveTimeout={1}
             >
+              {
+                this.state.moreInfoPopup && (
+                  <div className="meeting-schedule__more-info-popup" >
+                    <div>request to swap</div>
+                    <img src="" alt=""/>
+                  </div>
+                )
+              }
               {this.state.isHiddenPopup && (
                 <div className="meeting-schedule__popup">
                   <img src={CloseButton} className="popup__close-button" alt="" onClick={() => this.closePopupHandler()} />
@@ -262,7 +310,7 @@ class Meetings extends Component {
                   onDragStart={e => this.preventDefault(e)}
                   onMouseOver={() => this.mouseOver()}
                 />
-                <div className={"plus-box plus" + i} onClick={e => this.timeBlockClick(e, i)} >
+                <div className={"plus-box plus" + i} tabIndex="0" onClick={e => this.showMoreInfoPopup(e, i)} onBlur={() => this.hideMoreInfoPopup()} > {/* tabIndex need for working onBlur https://webaim.org/techniques/keyboard/tabindex */}
                   <div className={"box__plus-h horizontal" + i}></div>
                   <div className={"box__plus-v vertical" + i}></div>
                 </div>

@@ -166,6 +166,15 @@ progress {
 //     border-radius: 20px;
 //     // background-color: black;
 // }
+.header__order-pass-if-forgot-someone {
+  position: absolute;
+  top: 18px;
+  right: 200px;
+  width: 200px;
+  height: 36px;
+  border-radius: 4px;
+  background: #266dc2;
+}
 .header__button-create-meeting {
   position: absolute;
   top: 18px;
@@ -187,8 +196,6 @@ progress {
   // overflow: hidden;
 
   border-width: 0;
-  outline: none;
-  border-radius: 4px;
 
   background: #266dc2;
   box-shadow: 0 10px 10px -10px #266dc2;
@@ -494,6 +501,14 @@ progress {
   background: #bdc3c7;
   color: #000;
 }
+.new-meet-create__buttom-arrow {
+  position: absolute;
+  z-index: 1;
+  left: 1050px;
+  top: 258.5px;
+  width: 20px;
+  height: 20px;
+}
 .new-meet-create__time {
   position: relative;
   left: 910px;
@@ -505,8 +520,15 @@ progress {
   & ~ & {
     margin-left: 22px;
   }
-
   // font-size: 12px;
+}
+.new-meet-create__hyphen-between-times {
+  position: absolute;
+  left: 987px;
+  top: 177px;
+  font-size: 13px;
+  color: #fff;
+  letter-spacing: 0.47px;
 }
 .new-meet-create__label-theme {
   position: absolute;
@@ -591,6 +613,7 @@ progress {
 }
 .meeting-schedule__popup {
   // visibility: hidden;
+  position: absolute;
   width: 360px;
   height: 180px;
   background-color: crimson;
@@ -598,12 +621,23 @@ progress {
   text-align: center;
   border-radius: 6px;
   padding: 8px 0;
-  position: absolute;
   z-index: 1;
   // -webkit-animation: fadeIn 1s;
   animation: fadeIn 1s;
   // left: 50%;
   // margin-left: -80px;
+}
+.meeting-schedule__more-info-popup {
+  position: absolute;
+  width: 180px;
+  height: 90px;
+  background-color: #00b7a8;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 8px 0;
+  z-index: 1;
+  animation: fadeIn 1s;
 }
 .popup__close-button {
   position: absolute;
