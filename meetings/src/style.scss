@@ -302,8 +302,8 @@ progress {
   }
 }
 .new-meet-create__back-button {
-  position: absolute;
-  top: 331px;
+  position: relative;
+  top: 256px;
   left: 876px;
   width: 72px;
   height: 38px;
@@ -314,9 +314,9 @@ progress {
   z-index: 1000;
 }
 .new-meet-create__create-button {
-  position: absolute;
-  top: 331px;
-  left: 970px;
+  position: relative;
+  top: 256px;
+  left: 898px;
   width: 110px;
   height: 38px;
   border-radius: 4px;
@@ -474,13 +474,14 @@ progress {
 }
 .new-meet-create__recommended-meeting-rooms-text {
   position: absolute;
+  width: auto;
   left: 660px;
   top: 225px;
 }
 .new-meet-create__selected-meeting-room {
-  position: absolute;
+  position: relative;
   left: 660px;
-  top: 250px;
+  top: 213px;
   width: 420px;
   height: 37px;
   line-height: 37px;
@@ -490,9 +491,9 @@ progress {
   color: #000;
 }
 .new-meet-create__meet-room {
-  position: absolute;
+  position: relative;
   left: 660px;
-  top: 250px;
+  top: 213px;
   width: 420px;
   height: 37px;
   line-height: 37px;
@@ -500,6 +501,9 @@ progress {
   border-radius: 4px;
   background: #bdc3c7;
   color: #000;
+  & + & {
+    margin-top: 8px;
+  }
 }
 .new-meet-create__buttom-arrow {
   position: absolute;

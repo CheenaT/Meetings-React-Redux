@@ -7,8 +7,8 @@ export const participants = [
   },
   {
     id: 2,
-    name: "Darth Vader",
-    about: " &bull; Supreme commander of the Galactic Empire &bull; last floor",
+    name: "Genghis Khan",
+    about: " &bull; CEO and founter of Mongol Empire &bull; 18 floor",
     image: "./../../images/Anakin.jpg"
   },
   {

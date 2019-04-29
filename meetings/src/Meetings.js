@@ -5,6 +5,9 @@ import LeftArrow from "./images/arrow2.svg";
 import CloseButton from "./images/close.svg";
 import { CSSTransitionGroup } from "react-transition-group";
 import CreateNewMeetField from "./Components/Create-New-Meet-Field"
+import { connect } from 'react-redux';
+import { selectedTimeBlock } from './redux/actions';
+import {bindActionCreators} from 'redux';
 
 let q = document.querySelector.bind(document);
 
@@ -18,7 +21,6 @@ class Meetings extends Component {
     isHiddenPopup: false,
     newMeetWindowShown: false, // change to false
     lastClickedTimeBlock: 'none',
-    meetingRoomIsSelected: false,
     meetingRoom: '',
     meetingRooms: {
       0: 'Lomonosov',
@@ -59,33 +61,20 @@ class Meetings extends Component {
     });
   }
   newMeetCreate = () => {
-    this.setState({newMeetWindowShown: !this.state.newMeetWindowShown, meetingRoomIsSelected: false, meetingRoom: '' });
-  }
-  createMeetHandler = () => {
-
-    if ( this.state.lastClickedTimeBlock !== 'none') {
-      document.querySelector(".plus" + this.state.lastClickedTimeBlock).style.display = "block";
-      document.querySelector(".plus" + this.state.lastClickedTimeBlock).style.backgroundColor = "cyan";
-      document.querySelector(".horizontal" + this.state.lastClickedTimeBlock).style.display = "none";
-      document.querySelector(".vertical" + this.state.lastClickedTimeBlock).style.display = "none";
-      document.querySelector(".number" + this.state.lastClickedTimeBlock).value = 0;
-
-      let copyTimeBlocks = [...this.state.timeBlocks];
-      copyTimeBlocks[this.state.lastClickedTimeBlock] = true;
-      this.setState({timeBlocks: copyTimeBlocks,lastClickedTimeBlock: 'none'});
-    }
+    this.setState({newMeetWindowShown: !this.state.newMeetWindowShown, meetingRoom: '' });
   }
   advancedSettingsOnClick() {
-    this.setState({newMeetWindowShown: !this.state.newMeetWindowShown, meetingRoomIsSelected: true, isHiddenPopup: false});
+    this.setState({newMeetWindowShown: !this.state.newMeetWindowShown, isHiddenPopup: false});
   }
   mouseDownHandler(e, i) {
-    console.log(this.state.isClicked);
+    console.log(' move : ', this.state.isClicked);
     if (this.state.isClicked) {
       let rect = e.target.getBoundingClientRect();
       // console.log(' progrss click : ', (e.clientX - rect.left)/0.75, i , '.number' + `${i}` );
       let el = document.querySelector(".number" + i);
-      el.style.backgroundColor = "cyan";
-      el.value = Math.round((e.clientX - rect.left) / 0.75);
+      el.value = Math.round((e.clientX - rect.left) / 0.75) >= 95 ? 100 : Math.round((e.clientX - rect.left) / 0.75) ;
+      q(".horizontal" + i).style.display = "none";
+      q(".vertical" + i).style.display = "none";
       // console.log(' handler event pageX :', e.pageX, e.pageY, e.clientX);
       // document.querySelector('.number' + `${i}`).style.backgroundColor = 'black';
     }
@@ -132,10 +121,8 @@ class Meetings extends Component {
     // console.log(' progrss click : ', (e.clientX - rect.left)/0.75, i , '.number' + `${i}` );
     // let el = document.querySelector('.number' + `${i}`);
     // el.value = Math.round( (e.clientX - rect.left)/0.75 ); // 0.75 width of progress element
-    let q = document.querySelector.bind(document);
 
-    this.setState({meetingRoom: this.state.meetingRooms[Math.ceil(i/17)]}); // find meeting room by clicking on time block
-
+    this.setState({meetingRoom: this.state.meetingRooms[Math.floor(i/17)]}); // find meeting room by clicking on time block
     if (this.state.lastClickedTimeBlock !== 'none') { // remove plus icon and backgroundColor from last clicked time block and add it to current clicked time block
       q(".plus" + this.state.lastClickedTimeBlock).style.display = "none";
       q(".number" + this.state.lastClickedTimeBlock).value = 0;
@@ -210,7 +197,12 @@ class Meetings extends Component {
         </header>
         <div className="main">
           {this.state.newMeetWindowShown &&
-          <CreateNewMeetField createMeetHandler={this.createMeetHandler} newMeetCreate={this.newMeetCreate} meetingRoomIsSelected={this.state.meetingRoomIsSelected} meetingRoom={this.state.meetingRoom} />}
+          <CreateNewMeetField
+            timeBlocks={this.state.timeBlocks}
+            meetingRooms={this.state.meetingRooms}
+            newMeetCreate={this.newMeetCreate}
+            meetingRoom={this.state.meetingRoom}
+          />}
           <div className="main__time-now">
             {this.state.timeNow.toTimeString().slice(0, 5)}
           </div>
@@ -292,7 +284,12 @@ class Meetings extends Component {
                   <input className="poput__input-meet-name" type="text" placeholder="Meet name"/>
                   <input className="poput__input-meet-name" type="text" placeholder="date"/>
                   <input className="poput__input-meet-name" type="text" placeholder="Guests"/>
-                  <span className="popup__advanced-settings" onClick={() => this.advancedSettingsOnClick()} >advanced settings</span>
+                  <span
+                    className="popup__advanced-settings"
+                    onClick={() => this.advancedSettingsOnClick()}
+                  >
+                    advanced settings
+                  </span>
                   <button className="popup__advanced-confirm">confirm</button>
                 </div>
               )}
@@ -305,12 +302,18 @@ class Meetings extends Component {
                   max="100"
                   className={"box number" + i}
                   onMouseMove={e => this.mouseDownHandler(e, i)}
-                  onMouseDown={e => this.onClick(e, i)}
+                  onMouseDown={e => { this.onClick(e, i); this.props.selectedTimeBlock(i); } }
                   onMouseUp={() => this.isClickedFalse()}
                   onDragStart={e => this.preventDefault(e)}
                   onMouseOver={() => this.mouseOver()}
                 />
-                <div className={"plus-box plus" + i} tabIndex="0" onClick={e => this.showMoreInfoPopup(e, i)} onBlur={() => this.hideMoreInfoPopup()} > {/* tabIndex need for working onBlur https://webaim.org/techniques/keyboard/tabindex */}
+                <div
+                  className={"plus-box plus" + i}
+                  tabIndex="0"
+                  onClick={e => this.showMoreInfoPopup(e, i)}
+                  onMouseMove={e => this.mouseDownHandler(e, i)}
+                  onBlur={() => this.hideMoreInfoPopup()}
+                > {/* tabIndex need for working onBlur https://webaim.org/techniques/keyboard/tabindex */}
                   <div className={"box__plus-h horizontal" + i}></div>
                   <div className={"box__plus-v vertical" + i}></div>
                 </div>
@@ -323,4 +326,12 @@ class Meetings extends Component {
   }
 }
 
-export default Meetings;
+const mapStateToProps = state => {
+  return { timeBlocksR: state.timeBlocksR }
+}
+
+const mapDispatchToProps = dispatch => {
+  return bindActionCreators({ selectedTimeBlock: selectedTimeBlock }, dispatch);
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Meetings)

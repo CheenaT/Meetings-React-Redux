@@ -5,6 +5,7 @@
 10. Add recommended time to recommended meeting room
 13. Choose another meeting room
 15. Hide plus icon when mousemove on time block and increase progress tag value = 100 if his value >= 90
+16. Progress from clicked position
 ?14. Forgot to pass guest
 
 5. Reservation Info!particial
@@ -17,3 +18,7 @@
 9. date format with word month (01/january/19)!4
 
 Add cursor styles
+
+
+notes: meetingRoomIsSelected, recommendedMeetingRoom mb needless
+fix current time vertical line

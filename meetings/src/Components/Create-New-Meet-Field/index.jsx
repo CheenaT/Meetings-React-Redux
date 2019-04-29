@@ -3,6 +3,9 @@ import ButtomArrowIcon from './../../images/buttom-arrow.png';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { participants } from './data.js';
+import { connect } from 'react-redux';
+import { addMeet } from '../../redux/actions';
+import {bindActionCreators} from 'redux';
 
 function importAll(r) {
   return r.keys().map(r);
@@ -21,16 +24,29 @@ class CreateNewMeetField extends React.Component {
         ((+new Date().toTimeString().slice(3, 5) > 54 ? 1 : 0) + +new Date().toTimeString().slice(0, 2) ) +
         ":" + (+new Date().toTimeString().slice(3, 5) < 5 || +new Date().toTimeString().slice(3, 5) > 54 ? 0 : '' ) +
         (((((+new Date().toTimeString().slice(3, 5) + 5) / 5) | 0) * 5) % 60),
+      endTimeValue: ((       +new Date().toTimeString().slice(0, 2) +
+      (+new Date().toTimeString().slice(3, 5) + 30 > 54 ? 1 : 0)) % 24 === 0 ? '0' : '') + (       +new Date().toTimeString().slice(0, 2) +
+      (+new Date().toTimeString().slice(3, 5) + 30 > 54 ? 1 : 0)) % 24 +
+      ":" +
+        ( (((((+new Date().toTimeString().slice(3, 5) + 30 + 5) / 5) | 0) * 5) %
+        60) < 9 ? '0' : '' ) +               (((((+new Date().toTimeString().slice(3, 5) + 30 + 5) / 5) | 0) * 5) %
+        60),
       participantsListIsShown: false,
       startDate: new Date(),
-      recommendedMeetingRoom: this.props.meetingRoom ? this.props.meetingRoom : 'Unexplored territory',
+      recommendedMeetingRoom: this.props.meetingRoom ? this.props.meetingRoom : [], //'Unexplored territory, up to 30 people'
       people: {}
     };
-
+    let hours = new Date().getHours(), { meetingRooms, timeBlocksR } = this.props;
+    if ( !this.props.meetingRoom ) {
+      for( let i = 0; i < Object.keys(meetingRooms).length; i++ ) {
+        if ( !timeBlocksR.timeBlocks[hours - 8 + 17 * i] ) {
+          this.state.recommendedMeetingRoom.push(meetingRooms[i]);
+        }
+      }
+    }
     this.handleChange = this.handleChange.bind(this);
     // this.onFirstTimeChange = this.onFirstTimeChange.bind(this);
   }
-
   handleChange(date) {
     this.setState({
       startDate: date
@@ -44,6 +60,9 @@ class CreateNewMeetField extends React.Component {
   onFirstTimeChange(e) {
     this.setState({ timeValue: e.target.value });
   }
+  endTimeChange(e) {
+    this.setState({ endTimeValue: e.target.value });
+  }
   onFocusInput() {
     this.setState({ participantsListIsShown: true })
   }
@@ -51,22 +70,19 @@ class CreateNewMeetField extends React.Component {
     this.setState({ participantsListIsShown: false })
   }
   hoverMeetingRoom = () => {
-    this.setState({recommendedMeetingRoom: 'Choose another meeting room?'});
+    // this.setState({recommendedMeetingRoom: 'Choose another meeting room?'});
   }
   outMeetingRoom = () => {
-    console.log(this.props.meetingRoom);
-    this.setState({recommendedMeetingRoom: this.props.meetingRoom ? this.props.meetingRoom : 'Unexplored territory' });
+    // this.setState({recommendedMeetingRoom: this.props.meetingRoom ? this.props.meetingRoom : 'Unexplored territory, up to 30 people' });
   }
-  addParticipant = (e, name) => {
-    let newPeople = {...this.state.people, [name]: name }; // change 1 to id
+  addParticipant = (e, name, i) => {
+    let newPeople = {...this.state.people, [name]: { name, image: i } }; // change 1 to id
     this.setState({people: newPeople });
     console.log(' addParticipant : ', e, name, newPeople, this.state.people);
   }
   render() {
     return (
       <div>
-        <button className="new-meet-create__back-button" onClick={this.props.newMeetCreate}>Back</button>
-        <button className="new-meet-create__create-button" onClick={() => { this.props.createMeetHandler(); this.props.newMeetCreate() } }>Create</button> {/* TODO: pass number of time block by time and meeting room */}
         <form action="" className="main__new-meet-create">
 
           <div className="new-meet-create__text">New meet</div>
@@ -118,15 +134,8 @@ class CreateNewMeetField extends React.Component {
           <input
             type="time"
             className="new-meet-create__time"
-            value={
-              ((       +new Date().toTimeString().slice(0, 2) +
-              (+new Date().toTimeString().slice(3, 5) + 30 > 54 ? 1 : 0)) % 24 === 0 ? '0' : '') + (       +new Date().toTimeString().slice(0, 2) +
-              (+new Date().toTimeString().slice(3, 5) + 30 > 54 ? 1 : 0)) % 24 +
-              ":" +
-                ( (((((+new Date().toTimeString().slice(3, 5) + 30 + 5) / 5) | 0) * 5) %
-                60) < 9 ? '0' : '' ) +               (((((+new Date().toTimeString().slice(3, 5) + 30 + 5) / 5) | 0) * 5) %
-                60)
-            }
+            onChange={(e) => this.endTimeChange(e)}
+            value={this.state.endTimeValue}
           />
           <label htmlFor="select" className="new-meet-create__meet-people-label">People</label>
           <input placeholder="For example, Elon Musk" type="text" className="new-meet-create__meet-people" onFocus={() => this.onFocusInput()} onBlur={() => this.onBlurInput()} />
@@ -134,8 +143,8 @@ class CreateNewMeetField extends React.Component {
             <div style={{position: 'relative'}}>
               <ul className='new-meet-create__meet-people-list'> {console.log(' participants : ', participants)}
                 { participants.map( (el, i) =>
-                    <li onMouseDown={e => this.addParticipant(e, el.name)} ><img src={images[1]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>{el.name}<span>{el.about}</span></li>
-                )}
+                    <li onMouseDown={e => this.addParticipant(e, el.name, i)} ><img src={images[1]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>{el.name}<span>{el.about}</span></li>
+                )} {/* change images[1] to images[i] */}
                 {/*<li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[1]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Darth Vader<span> &bull; Supreme commander of the Galactic Empire &bull; last floor</span></li>
                 <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[6]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Genghis Khan<span> &bull; CEO and founter of Mongol Empire &bull; 18 floor</span></li>
                 <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[10]} width="24px" height="24px" className="meet-people-list__avatar" alt="terrible hitman"/>Vincent Vega<span> &bull; hitman &bull; 2 floor</span></li>
@@ -202,20 +211,34 @@ class CreateNewMeetField extends React.Component {
             <input type="radio" id="line6" name="line-style" value="6"  /><label htmlFor="line6"></label>
             <input type="radio" id="line7" name="line-style" value="7"  /><label htmlFor="line7"></label>
           </div>*/}
-          <span className="new-meet-create__recommended-meeting-rooms-text">{this.props.meetingRoomIsSelected ? 'Meeting room' : 'Recommended meeting room' }{false ? 's' : ''}</span>
+          <span className="new-meet-create__recommended-meeting-rooms-text">{this.props.meetingRoom ? 'Meeting room' : 'Recommended meeting room' }{false ? 's' : ''}</span>
           <img src={ButtomArrowIcon} alt="" className="new-meet-create__buttom-arrow" onMouseOver={this.hoverMeetingRoom} onMouseOut={this.outMeetingRoom} />
-          { this.props.meetingRoomIsSelected ?
+          { this.props.meetingRoom ?
             <div className="new-meet-create__selected-meeting-room" onMouseOver={this.hoverMeetingRoom} onMouseOut={this.outMeetingRoom} >{this.state.recommendedMeetingRoom}</div> :
-            <div className="new-meet-create__recommended-meeting-rooms">
-              <div className="new-meet-create__meet-room" onMouseOver={this.hoverMeetingRoom} onMouseOut={this.outMeetingRoom} >{this.state.recommendedMeetingRoom}</div>
-            </div> }
-
+            this.state.recommendedMeetingRoom.map( el =>
+                <div key={el} className="new-meet-create__meet-room" onMouseOver={this.hoverMeetingRoom} onMouseOut={this.outMeetingRoom} >
+                  {el}
+                </div>
+            )
+          }
+          <button
+            className="new-meet-create__back-button"
+            onClick={this.props.newMeetCreate}
+          >
+            {'Back'}
+          </button>
+          <button
+            className="new-meet-create__create-button"
+            onClick={() => { this.props.newMeetCreate(); this.props.addMeet(this.props.timeBlocksR.selectedTimeBlock) } }
+          >
+            {'Create'}
+          </button> {/* TODO: pass number of time block by time and meeting room */}
           <div className="invated-people">
             {/*{people.map( el => (<div className="invated-people__participant">{el.name}</div>))}*/}
             {Object.keys(this.state.people).map((keyName, i) => (
                 <div className="invated-people__participant" key={i}>
                     {/*<span className="input-label">key: {i} Name: {subjects[keyName]}</span>*/}
-                    {this.state.people[keyName]}
+                    {this.state.people[keyName].name}
                 </div>
             ))}
           </div>
@@ -225,4 +248,16 @@ class CreateNewMeetField extends React.Component {
   }
 }
 
-export default CreateNewMeetField;
+const mapStateToProps = state => {
+  return { timeBlocksR: state.timeBlocksR }
+}
+
+{/*const mapDispatchToProps = dispatch => {
+  return
+}*/}
+
+function mapDispatchToProps(dispatch){
+   return bindActionCreators({ addMeet: addMeet}, dispatch);
+ }
+
+export default connect(mapStateToProps, mapDispatchToProps)(CreateNewMeetField)
