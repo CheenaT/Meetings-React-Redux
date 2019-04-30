@@ -15,7 +15,7 @@ const timeBlocksR = ( state = initialState, action) => {
       q(".horizontal" + id).style.display = "none";
       q(".vertical" + id).style.display = "none";
       q(".number" + id).value = 0;
-      return copyTimeBlocks;
+      return { ...copyTimeBlocks, selectedTimeBlock: -1 };
     }
     // case 'DELETE_MEET':
     case 'SET_TIME_BLOCK': {

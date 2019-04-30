@@ -20,7 +20,7 @@ class CreateNewMeetField extends React.Component {
     super(props);
 
     this.state = {
-      timeValue: (((+new Date().toTimeString().slice(3, 5) > 54 ? 1 : 0) + +new Date().toTimeString().slice(0, 2) ) < 9 ? '0' : 0) +
+      beginTimeValue: (((+new Date().toTimeString().slice(3, 5) > 54 ? 1 : 0) + +new Date().toTimeString().slice(0, 2) ) < 9 ? '0' : 0) +
         ((+new Date().toTimeString().slice(3, 5) > 54 ? 1 : 0) + +new Date().toTimeString().slice(0, 2) ) +
         ":" + (+new Date().toTimeString().slice(3, 5) < 5 || +new Date().toTimeString().slice(3, 5) > 54 ? 0 : '' ) +
         (((((+new Date().toTimeString().slice(3, 5) + 5) / 5) | 0) * 5) % 60),
@@ -39,6 +39,7 @@ class CreateNewMeetField extends React.Component {
     let hours = new Date().getHours(), { meetingRooms, timeBlocksR } = this.props;
     if ( !this.props.meetingRoom ) {
       for( let i = 0; i < Object.keys(meetingRooms).length; i++ ) {
+        console.log(' debug timeBlocks : ', timeBlocksR.timeBlocks[hours - 8 + 17 * i]);
         if ( !timeBlocksR.timeBlocks[hours - 8 + 17 * i] ) {
           this.state.recommendedMeetingRoom.push(meetingRooms[i]);
         }
@@ -54,11 +55,30 @@ class CreateNewMeetField extends React.Component {
   }
 
   componentDidMount() {
+    this.timerID = setInterval( () => this.tick(), 5 * 60 * 1000 );
     console.log(document.getElementById('meet-date'));
     // document.getElementById('meet-date').value = new Date().toJSON().slice(0,10);
   }
+  componentWillUnmount() {
+    clearInterval(this.timerID);
+  }
+  tick = () => {
+    this.setState({
+      beginTimeValue: (((+new Date().toTimeString().slice(3, 5) > 54 ? 1 : 0) + +new Date().toTimeString().slice(0, 2) ) < 9 ? '0' : 0) +
+        ((+new Date().toTimeString().slice(3, 5) > 54 ? 1 : 0) + +new Date().toTimeString().slice(0, 2) ) +
+        ":" + (+new Date().toTimeString().slice(3, 5) < 5 || +new Date().toTimeString().slice(3, 5) > 54 ? 0 : '' ) +
+        (((((+new Date().toTimeString().slice(3, 5) + 5) / 5) | 0) * 5) % 60),
+      endTimeValue: ((       +new Date().toTimeString().slice(0, 2) +
+      (+new Date().toTimeString().slice(3, 5) + 30 > 54 ? 1 : 0)) % 24 === 0 ? '0' : '') + (       +new Date().toTimeString().slice(0, 2) +
+      (+new Date().toTimeString().slice(3, 5) + 30 > 54 ? 1 : 0)) % 24 +
+      ":" +
+        ( (((((+new Date().toTimeString().slice(3, 5) + 30 + 5) / 5) | 0) * 5) %
+        60) < 9 ? '0' : '' ) +               (((((+new Date().toTimeString().slice(3, 5) + 30 + 5) / 5) | 0) * 5) %
+        60)
+    })
+  }
   onFirstTimeChange(e) {
-    this.setState({ timeValue: e.target.value });
+    this.setState({ beginTimeValue: e.target.value });
   }
   endTimeChange(e) {
     this.setState({ endTimeValue: e.target.value });
@@ -69,11 +89,22 @@ class CreateNewMeetField extends React.Component {
   onBlurInput() {
     this.setState({ participantsListIsShown: false })
   }
-  hoverMeetingRoom = () => {
-    // this.setState({recommendedMeetingRoom: 'Choose another meeting room?'});
+  hoverMeetingRoom = (e, i) => {
+    if ( !i ) {
+      this.setState({recommendedMeetingRoom: ['Choose another meeting room?']});
+    }
   }
   outMeetingRoom = () => {
-    // this.setState({recommendedMeetingRoom: this.props.meetingRoom ? this.props.meetingRoom : 'Unexplored territory, up to 30 people' });
+    let copyRecommendedMeetingRoom = [], hours = new Date().getHours(), { meetingRooms, timeBlocksR } = this.props;;
+    if ( !this.props.meetingRoom ) {
+      for( let i = 0; i < Object.keys(meetingRooms).length; i++ ) {
+        console.log(' debug timeBlocks : ', timeBlocksR.timeBlocks[hours - 8 + 17 * i]);
+        if ( !timeBlocksR.timeBlocks[hours - 8 + 17 * i] ) {
+          copyRecommendedMeetingRoom.push(meetingRooms[i]);
+        }
+      }
+    }
+    this.setState({recommendedMeetingRoom: this.props.meetingRoom ? this.props.meetingRoom : copyRecommendedMeetingRoom });
   }
   addParticipant = (e, name, i) => {
     let newPeople = {...this.state.people, [name]: { name, image: i } }; // change 1 to id
@@ -125,7 +156,7 @@ class CreateNewMeetField extends React.Component {
             type="time"
             className="new-meet-create__time"
             onChange={(e) => this.onFirstTimeChange(e)}
-            value = {this.state.timeValue}
+            value = {this.state.beginTimeValue}
           />
           <div className="new-meet-create__hyphen-between-times">—</div>
           <label htmlFor="meet-date" className="new-meet-create__label-date-end">
@@ -215,8 +246,8 @@ class CreateNewMeetField extends React.Component {
           <img src={ButtomArrowIcon} alt="" className="new-meet-create__buttom-arrow" onMouseOver={this.hoverMeetingRoom} onMouseOut={this.outMeetingRoom} />
           { this.props.meetingRoom ?
             <div className="new-meet-create__selected-meeting-room" onMouseOver={this.hoverMeetingRoom} onMouseOut={this.outMeetingRoom} >{this.state.recommendedMeetingRoom}</div> :
-            this.state.recommendedMeetingRoom.map( el =>
-                <div key={el} className="new-meet-create__meet-room" onMouseOver={this.hoverMeetingRoom} onMouseOut={this.outMeetingRoom} >
+            this.state.recommendedMeetingRoom.map( (el, i) =>
+                <div key={el} className="new-meet-create__meet-room" onMouseOver={ e => this.hoverMeetingRoom(e, i)} onMouseOut={this.outMeetingRoom} >
                   {el}
                 </div>
             )

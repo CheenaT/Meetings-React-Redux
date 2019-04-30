@@ -20,7 +20,6 @@ class Meetings extends Component {
     timeNow: new Date(),
     isHiddenPopup: false,
     newMeetWindowShown: false, // change to false
-    lastClickedTimeBlock: 'none',
     meetingRoom: '',
     meetingRooms: {
       0: 'Lomonosov',
@@ -44,9 +43,9 @@ class Meetings extends Component {
       289 +
       (new Date().getHours() - 7) * 76 +
       (75 / 60) * new Date().getMinutes();
-    document.querySelector(".main__vertical-line").style.left =
+    q(".main__vertical-line").style.left =
       offsetForVerticalTimeLine + "px";
-    document.querySelector(".main__time-now").style.left =
+    q(".main__time-now").style.left =
       offsetForVerticalTimeLine - 22 + "px";
 
     this.timerId = setInterval(() => this.tick(), 60 * 1000);
@@ -61,20 +60,22 @@ class Meetings extends Component {
     });
   }
   newMeetCreate = () => {
-    this.setState({newMeetWindowShown: !this.state.newMeetWindowShown, meetingRoom: '' });
+    this.setState({newMeetWindowShown: !this.state.newMeetWindowShown, isHiddenPopup: false, meetingRoom: '' });
   }
   advancedSettingsOnClick() {
     this.setState({newMeetWindowShown: !this.state.newMeetWindowShown, isHiddenPopup: false});
   }
-  mouseDownHandler(e, i) {
+  mouseMoveHandler(e, i) {
     console.log(' move : ', this.state.isClicked);
     if (this.state.isClicked) {
       let rect = e.target.getBoundingClientRect();
       // console.log(' progrss click : ', (e.clientX - rect.left)/0.75, i , '.number' + `${i}` );
-      let el = document.querySelector(".number" + i);
+      let el = q(".number" + i);
       el.value = Math.round((e.clientX - rect.left) / 0.75) >= 95 ? 100 : Math.round((e.clientX - rect.left) / 0.75) ;
-      q(".horizontal" + i).style.display = "none";
-      q(".vertical" + i).style.display = "none";
+      if ( q(".horizontal" + i).style.display !== "none" || q(".vertical" + i).style.display !== "none" ) {
+        q(".horizontal" + i).style.display = "none";
+        q(".vertical" + i).style.display = "none";
+      }
       // console.log(' handler event pageX :', e.pageX, e.pageY, e.clientX);
       // document.querySelector('.number' + `${i}`).style.backgroundColor = 'black';
     }
@@ -83,7 +84,7 @@ class Meetings extends Component {
     }
   }
   showMoreInfoPopup = (e, i) => {
-
+    this.setState({ isClicked: true });
     if( this.state.timeBlocks[i] ) {
       if (this.state.moreInfoPopup) {
         this.setState({ moreInfoPopup: false });
@@ -112,52 +113,47 @@ class Meetings extends Component {
     }
   }
   hideMoreInfoPopup = () => {
-    console.log('debug');
     this.setState({moreInfoPopup: false});
   }
-  onClick(e, i) {
+  onMouseDown(e, i) {
     // if (this.state.isOver)
     // let rect = e.target.getBoundingClientRect();
     // console.log(' progrss click : ', (e.clientX - rect.left)/0.75, i , '.number' + `${i}` );
     // let el = document.querySelector('.number' + `${i}`);
     // el.value = Math.round( (e.clientX - rect.left)/0.75 ); // 0.75 width of progress element
 
-    this.setState({meetingRoom: this.state.meetingRooms[Math.floor(i/17)]}); // find meeting room by clicking on time block
-    if (this.state.lastClickedTimeBlock !== 'none') { // remove plus icon and backgroundColor from last clicked time block and add it to current clicked time block
-      q(".plus" + this.state.lastClickedTimeBlock).style.display = "none";
-      q(".number" + this.state.lastClickedTimeBlock).value = 0;
+    this.setState({ isClicked: true, meetingRoom: this.state.meetingRooms[Math.floor(i/17)]}); // find meeting room by clicking on time block
+    console.log(' lastSelected : ', this.props.timeBlocksR.selectedTimeBlock, i);
+    if ( this.props.timeBlocksR.selectedTimeBlock !== -1 && this.props.timeBlocksR.selectedTimeBlock !== i ) { // remove plus icon and backgroundColor from last clicked time block and add it to current clicked time block
+      q(".plus" + this.props.timeBlocksR.selectedTimeBlock).style.display = "none";
+      q(".number" + this.props.timeBlocksR.selectedTimeBlock).value = 0;
     }
     q(".plus" + i).style.display = "block";
-    this.setState({lastClickedTimeBlock: i});
+    q(".horizontal" + i).style.display = "block";
+    q(".vertical" + i).style.display = "block";
+    this.props.selectedTimeBlock(i);
 
     if (this.state.isHiddenPopup) {
       this.setState({ isHiddenPopup: false });
-      let offsetLeft = Math.ceil((e.clientX - q(".main__meeting-rooms").offsetWidth) / 75)*75,
-        offsetTop =
-          e.clientY -
-          q(".header").offsetHeight -
-          q(".main__date-picker").offsetHeight;
-      offsetLeft = (offsetLeft + 360 + q(".main__meeting-rooms").offsetWidth) > window.innerWidth ? (Math.floor((e.clientX - q(".main__meeting-rooms").offsetWidth) / 75)*75 - 360 + ( (Math.floor((e.clientX - q(".main__meeting-rooms").offsetWidth) / 75) ) - 1 ) ) : offsetLeft;
-          console.log(" clientX ", e.clientY, e.clientX);
-          console.log(' offsets : ', offsetLeft, offsetTop, q(".main__meeting-rooms").offsetWidth, (Math.floor((e.clientX - q(".main__meeting-rooms").offsetWidth) / 75)*75 ));
+
+      let offsetLeft = Math.ceil((e.clientX - q(".main__meeting-rooms").offsetWidth) / 75)*75 + Math.ceil((e.clientX - q(".main__meeting-rooms").offsetWidth) / 75) + 5,
+          offsetTop = 47 + Math.floor(i/17) * 51.6 + (Math.floor(i/17) > 3 ? 30.4 : 0) - 12;
+      offsetLeft = (offsetLeft + 360 + q(".main__meeting-rooms").offsetWidth) > window.innerWidth ? (Math.floor((e.clientX - q(".main__meeting-rooms").offsetWidth) / 75)*75 - 360 + ( (Math.floor((e.clientX - q(".main__meeting-rooms").offsetWidth) / 75) ) - 1 ) ) - 5 : offsetLeft;
+
       setTimeout(() => {
         q(".number" + i).value = 100;
-        this.setState({ isClicked: true, isHiddenPopup: true });
-        // let rect = e.target.getBoundingClientRect();
+        this.setState({ isHiddenPopup: true });
         q(".meeting-schedule__popup").style.left = offsetLeft + "px";
         q(".meeting-schedule__popup").style.top = offsetTop + "px";
       }, 10);
     } else {
       q(".number" + i).value = 100;
-      this.setState({ isClicked: true, isHiddenPopup: true });
-      // let rect = e.target.getBoundingClientRect();
-      let offsetLeft = e.clientX - q(".main__meeting-rooms").offsetWidth,
-        offsetTop =
-          e.clientY -
-          q(".header").offsetHeight -
-          q(".main__date-picker").offsetHeight;
-      console.log(" clientX ", e.clientY, offsetTop);
-      console.log(' offsets : ', offsetLeft, offsetTop);
+      this.setState({ isHiddenPopup: true });
+
+      let offsetLeft = Math.ceil((e.clientX - q(".main__meeting-rooms").offsetWidth) / 75)*75 + Math.ceil((e.clientX - q(".main__meeting-rooms").offsetWidth) / 75) + 5,
+          offsetTop = 47 + Math.floor(i/17) * 51.6 + (Math.floor(i/17) > 3 ? 30.4 : 0) - 12;
+      offsetLeft = (offsetLeft + 360 + q(".main__meeting-rooms").offsetWidth) > window.innerWidth ? (Math.floor((e.clientX - q(".main__meeting-rooms").offsetWidth) / 75)*75 - 360 + ( (Math.floor((e.clientX - q(".main__meeting-rooms").offsetWidth) / 75) ) - 1 ) ) - 5 : offsetLeft;
+
       setTimeout(() => {
         q(".meeting-schedule__popup").style.left = offsetLeft + "px";
         q(".meeting-schedule__popup").style.top = offsetTop + "px";
@@ -167,11 +163,15 @@ class Meetings extends Component {
   closePopupHandler() {
     this.setState({isHiddenPopup: false});
   }
-  isClickedFalse() {
-    console.log(" onMouseUp : ", this.state.isClicked);
+  isClickedFalse(e, i) {
+    console.log(" onMouseUp : ", this.state.isClicked, i);
+    q(".plus" + i).style.display = "block";
+    q(".horizontal" + i).style.display = "block";
+    q(".vertical" + i).style.display = "block";
     this.setState({ isClicked: false });
   }
   preventDefault(e) {
+    // this.setState({ isClicked: false });
     e.preventDefault();
   }
   mouseOver() {
@@ -179,7 +179,7 @@ class Meetings extends Component {
   }
   render() {
     return (
-      <div className="basicLayout">
+      <div className="basicLayout"> {console.log(' debug selected : ', this.props.timeBlocksR.selectedTimeBlock)}
         <header className="header">
           <img
             className="header__gp-icon"
@@ -301,17 +301,19 @@ class Meetings extends Component {
                   value="0"
                   max="100"
                   className={"box number" + i}
-                  onMouseMove={e => this.mouseDownHandler(e, i)}
-                  onMouseDown={e => { this.onClick(e, i); this.props.selectedTimeBlock(i); } }
-                  onMouseUp={() => this.isClickedFalse()}
-                  onDragStart={e => this.preventDefault(e)}
-                  onMouseOver={() => this.mouseOver()}
+                  onMouseMove={ e => this.mouseMoveHandler(e, i) }
+                  onMouseDown={ e => this.onMouseDown(e, i) }
+                  onMouseUp={ e => this.isClickedFalse(e, i) }
+                  onDragStart={ e => this.preventDefault(e) }
+                  onMouseOver={ () => this.mouseOver() }
                 />
                 <div
                   className={"plus-box plus" + i}
                   tabIndex="0"
-                  onClick={e => this.showMoreInfoPopup(e, i)}
-                  onMouseMove={e => this.mouseDownHandler(e, i)}
+                  onMouseMove={e => this.mouseMoveHandler(e, i)}
+                  onMouseDown={e => { this.onMouseDown(e, i); this.showMoreInfoPopup(e, i) } }
+                  onMouseUp={ e => this.isClickedFalse(e, i) }
+                  onDragStart={ e => this.preventDefault(e) }
                   onBlur={() => this.hideMoreInfoPopup()}
                 > {/* tabIndex need for working onBlur https://webaim.org/techniques/keyboard/tabindex */}
                   <div className={"box__plus-h horizontal" + i}></div>
