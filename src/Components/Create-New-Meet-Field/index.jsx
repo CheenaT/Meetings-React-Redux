@@ -1,11 +1,12 @@
 import React from "react";
 import ButtomArrowIcon from './../../images/buttom-arrow.png';
+import CircleIconWithClose from './../../images/icon-circle-with-close.svg';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { participants } from './data.js';
+import { participants, meetingRooms } from '../../constants.js';
 import { connect } from 'react-redux';
-import { addMeet } from '../../redux/actions';
-import {bindActionCreators} from 'redux';
+import { addMeet, newMeetWindowShow } from '../../redux/actions';
+import { bindActionCreators } from 'redux';
 
 function importAll(r) {
   return r.keys().map(r);
@@ -33,11 +34,12 @@ class CreateNewMeetField extends React.Component {
         60),
       participantsListIsShown: false,
       startDate: new Date(),
-      recommendedMeetingRoom: this.props.meetingRoom ? this.props.meetingRoom : [], //'Unexplored territory, up to 30 people'
-      people: {}
+      recommendedMeetingRoom: [], //'Unexplored territory, up to 30 people'
+      people: {},
+      meetingRoomIsHover: false
     };
-    let hours = new Date().getHours(), { meetingRooms, timeBlocksR } = this.props;
-    if ( !this.props.meetingRoom ) {
+    let hours = new Date().getHours(), { timeBlocksR } = this.props;
+    if ( !this.props.timeBlocksR.selectedMeetingRoom ) {
       for( let i = 0; i < Object.keys(meetingRooms).length; i++ ) {
         console.log(' debug timeBlocks : ', timeBlocksR.timeBlocks[hours - 8 + 17 * i]);
         if ( !timeBlocksR.timeBlocks[hours - 8 + 17 * i] ) {
@@ -90,21 +92,17 @@ class CreateNewMeetField extends React.Component {
     this.setState({ participantsListIsShown: false })
   }
   hoverMeetingRoom = (e, i) => {
-    if ( !i ) {
-      this.setState({recommendedMeetingRoom: ['Choose another meeting room?']});
-    }
-  }
-  outMeetingRoom = () => {
-    let copyRecommendedMeetingRoom = [], hours = new Date().getHours(), { meetingRooms, timeBlocksR } = this.props;;
-    if ( !this.props.meetingRoom ) {
+    let copyRecommendedMeetingRoom = [], hours = new Date().getHours(), { timeBlocksR } = this.props;
       for( let i = 0; i < Object.keys(meetingRooms).length; i++ ) {
-        console.log(' debug timeBlocks : ', timeBlocksR.timeBlocks[hours - 8 + 17 * i]);
+        console.log(' debug timeBlocks : ', timeBlocksR.timeBlocks[hours - 8 + 17 * i] );
         if ( !timeBlocksR.timeBlocks[hours - 8 + 17 * i] ) {
           copyRecommendedMeetingRoom.push(meetingRooms[i]);
         }
       }
-    }
-    this.setState({recommendedMeetingRoom: this.props.meetingRoom ? this.props.meetingRoom : copyRecommendedMeetingRoom });
+      this.setState({ recommendedMeetingRoom: copyRecommendedMeetingRoom, meetingRoomIsHover: true });
+  }
+  outMeetingRoom = () => {
+    this.setState({recommendedMeetingRoom: [], meetingRoomIsHover: false });
   }
   addParticipant = (e, name, i) => {
     let newPeople = {...this.state.people, [name]: { name, image: i } }; // change 1 to id
@@ -115,7 +113,11 @@ class CreateNewMeetField extends React.Component {
     return (
       <div>
         <form action="" className="main__new-meet-create">
-
+          <img
+            onClick={this.props.newMeetWindowShow}
+            src={CircleIconWithClose} alt=""
+            className="new-meet-create__circle-icon-with-close"
+          />
           <div className="new-meet-create__text">New meet</div>
           <label htmlFor="meet-title" className="new-meet-create__label-theme">
             Theme
@@ -174,7 +176,7 @@ class CreateNewMeetField extends React.Component {
             <div style={{position: 'relative'}}>
               <ul className='new-meet-create__meet-people-list'> {console.log(' participants : ', participants)}
                 { participants.map( (el, i) =>
-                    <li onMouseDown={e => this.addParticipant(e, el.name, i)} ><img src={images[1]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>{el.name}<span>{el.about}</span></li>
+                    <li key={i} onMouseDown={e => this.addParticipant(e, el.name, i)} ><img src={images[i]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>{el.name}<span>{el.about}</span></li>
                 )} {/* change images[1] to images[i] */}
                 {/*<li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[1]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Darth Vader<span> &bull; Supreme commander of the Galactic Empire &bull; last floor</span></li>
                 <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[6]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Genghis Khan<span> &bull; CEO and founter of Mongol Empire &bull; 18 floor</span></li>
@@ -242,25 +244,34 @@ class CreateNewMeetField extends React.Component {
             <input type="radio" id="line6" name="line-style" value="6"  /><label htmlFor="line6"></label>
             <input type="radio" id="line7" name="line-style" value="7"  /><label htmlFor="line7"></label>
           </div>*/}
-          <span className="new-meet-create__recommended-meeting-rooms-text">{this.props.meetingRoom ? 'Meeting room' : 'Recommended meeting room' }{false ? 's' : ''}</span>
-          <img src={ButtomArrowIcon} alt="" className="new-meet-create__buttom-arrow" onMouseOver={this.hoverMeetingRoom} onMouseOut={this.outMeetingRoom} />
-          { this.props.meetingRoom ?
-            <div className="new-meet-create__selected-meeting-room" onMouseOver={this.hoverMeetingRoom} onMouseOut={this.outMeetingRoom} >{this.state.recommendedMeetingRoom}</div> :
+          <span className="new-meet-create__recommended-meeting-rooms-text">{this.props.timeBlocksR.selectedMeetingRoom ? 'Meeting room' : 'Recommended meeting room' }{false ? 's' : ''}</span>
+          { this.props.timeBlocksR.selectedMeetingRoom &&
+            <div className="new-meet-create__selected-meeting-room" onMouseOver={this.hoverMeetingRoom} onMouseOut={this.outMeetingRoom} >
+              <img src={ButtomArrowIcon} alt="" className="new-meet-create__buttom-arrow" onMouseOver={this.hoverMeetingRoom} onMouseOut={this.outMeetingRoom} />
+              { this.state.meetingRoomIsHover ? 'Choose another meeting room?' : this.props.timeBlocksR.selectedMeetingRoom}
+            </div> }
+            {console.log(' debug condition : ', this.props.timeBlocksR.selectedMeetingRoom, !!this.props.timeBlocksR.selectedMeetingRoom, this.state.meetingRoomIsHover, !!this.state.meetingRoomIsHover )}
+          { ( this.props.timeBlocksR.selectedMeetingRoom && this.state.meetingRoomIsHover ) ?
             this.state.recommendedMeetingRoom.map( (el, i) =>
-                <div key={el} className="new-meet-create__meet-room" onMouseOver={ e => this.hoverMeetingRoom(e, i)} onMouseOut={this.outMeetingRoom} >
+                <div key={el} className="new-meet-create__meet-room" >
+                  {el}
+                </div>
+            ) :
+            this.state.recommendedMeetingRoom.map( (el, i) =>
+                <div key={el} className="new-meet-create__meet-room" >
                   {el}
                 </div>
             )
           }
           <button
             className="new-meet-create__back-button"
-            onClick={this.props.newMeetCreate}
+            onClick={this.props.newMeetWindowShow}
           >
             {'Back'}
           </button>
           <button
             className="new-meet-create__create-button"
-            onClick={() => { this.props.newMeetCreate(); this.props.addMeet(this.props.timeBlocksR.selectedTimeBlock) } }
+            onClick={() => { this.props.addMeet(this.props.timeBlocksR.selectedTimeBlock) } }
           >
             {'Create'}
           </button> {/* TODO: pass number of time block by time and meeting room */}
@@ -288,7 +299,7 @@ const mapStateToProps = state => {
 }*/}
 
 function mapDispatchToProps(dispatch){
-   return bindActionCreators({ addMeet: addMeet}, dispatch);
+   return bindActionCreators({ addMeet: addMeet, newMeetWindowShow: newMeetWindowShow }, dispatch);
  }
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreateNewMeetField)

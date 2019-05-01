@@ -1,9 +1,9 @@
 3. Request to swap time reservation, Request to shift / unshift time
 4. Reepat meet
 10. Add recommended time to recommended meeting room
-13. Choose another meeting room
 ?14. Forgot to pass guest
 
+13. Choose another meeting room! particial
 7. Recommended meeting room!particial
 5. Reservation Info!particial
 2. Add meet in schedule!particial

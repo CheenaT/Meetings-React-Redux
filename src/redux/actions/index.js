@@ -5,9 +5,16 @@ export const addMeet = id => ({
   }
 });
 
-export const selectedTimeBlock = id => ({
+export const setSelectedTimeBlock = id => ({
   type: 'SET_TIME_BLOCK',
-  payload: {
-    id
-  }
+  id
 });
+
+export const newMeetWindowShow = () => ({
+  type: 'TOGGLE_WINDOW_SHOW'
+})
+
+export const setMeetingRoom = selectedMeetingRoom => ({
+  type: 'SET_MEETING_ROOM',
+  selectedMeetingRoom
+})

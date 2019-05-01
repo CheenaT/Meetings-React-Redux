@@ -208,5 +208,16 @@ export const participants = [
     name: "Darth Vader",
     about: " • Supreme commander of the Galactic Empire • last floor",
     image: "./../../images/Anakin.jpg"
-  },
+  }
 ];
+
+export const meetingRooms = {
+  0: "Lomonosov",
+  1: "Pavlov",
+  2: "Kapitza",
+  3: "Tamm",
+  4: "Mendeleev",
+  5: "Perelman",
+  6: "Lobachevsky",
+  7: "Landau"
+};

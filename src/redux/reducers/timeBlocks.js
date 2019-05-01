@@ -1,6 +1,8 @@
 const initialState = {
   timeBlocks: [],
-  selectedTimeBlock: -1
+  selectedTimeBlock: -1,
+  newMeetWindowShown: false,
+  selectedMeetingRoom: ''
 }
 
 let q = document.querySelector.bind(document);
@@ -19,8 +21,13 @@ const timeBlocksR = ( state = initialState, action) => {
     }
     // case 'DELETE_MEET':
     case 'SET_TIME_BLOCK': {
-      const { id } = action.payload;
-      return {...state, selectedTimeBlock: id }
+      return {...state, selectedTimeBlock: action.id }
+    }
+    case 'TOGGLE_WINDOW_SHOW': {
+      return {...state, newMeetWindowShown: !state.newMeetWindowShown }
+    }
+    case 'SET_MEETING_ROOM': {
+      return {...state, selectedMeetingRoom: action.selectedMeetingRoom }
     }
     default:
       return state
