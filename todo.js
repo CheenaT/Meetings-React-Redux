@@ -1,6 +1,7 @@
 3. Request to swap time reservation, Request to shift / unshift time
 4. Reepat meet
 10. Add recommended time to recommended meeting room
+17. Add background participants people onHover
 ?14. Forgot to pass guest
 
 13. Choose another meeting room! particial

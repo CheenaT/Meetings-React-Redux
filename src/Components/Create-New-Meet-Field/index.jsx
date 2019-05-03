@@ -5,7 +5,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { participants, meetingRooms } from '../../constants.js';
 import { connect } from 'react-redux';
-import { addMeet, newMeetWindowShow } from '../../redux/actions';
+import { addMeet, newMeetWindowShow, setMeetingRoom } from '../../redux/actions';
 import { bindActionCreators } from 'redux';
 
 function importAll(r) {
@@ -173,7 +173,7 @@ class CreateNewMeetField extends React.Component {
           <label htmlFor="select" className="new-meet-create__meet-people-label">People</label>
           <input placeholder="For example, Elon Musk" type="text" className="new-meet-create__meet-people" onFocus={() => this.onFocusInput()} onBlur={() => this.onBlurInput()} />
           { this.state.participantsListIsShown &&
-            <div style={{position: 'relative'}}>
+            <div className="new-meet-create__participants-list" >
               <ul className='new-meet-create__meet-people-list'> {console.log(' participants : ', participants)}
                 { participants.map( (el, i) =>
                     <li key={i} onMouseDown={e => this.addParticipant(e, el.name, i)} ><img src={images[i]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>{el.name}<span>{el.about}</span></li>
@@ -265,15 +265,19 @@ class CreateNewMeetField extends React.Component {
           }
           <button
             className="new-meet-create__back-button"
-            onClick={this.props.newMeetWindowShow}
+            onClick={() => {this.props.newMeetWindowShow(); this.props.setMeetingRoom() } }
           >
             {'Back'}
           </button>
           <button
             className="new-meet-create__create-button"
-            onClick={() => { this.props.addMeet(this.props.timeBlocksR.selectedTimeBlock) } }
+            onClick={() => {
+              this.props.setMeetingRoom("");
+              this.props.addMeet(this.props.timeBlocksR.selectedTimeBlock);
+              this.props.newMeetWindowShow();
+            }}
           >
-            {'Create'}
+            {"Create"}
           </button> {/* TODO: pass number of time block by time and meeting room */}
           <div className="invated-people">
             {/*{people.map( el => (<div className="invated-people__participant">{el.name}</div>))}*/}
@@ -299,7 +303,7 @@ const mapStateToProps = state => {
 }*/}
 
 function mapDispatchToProps(dispatch){
-   return bindActionCreators({ addMeet: addMeet, newMeetWindowShow: newMeetWindowShow }, dispatch);
+   return bindActionCreators({ addMeet: addMeet, newMeetWindowShow: newMeetWindowShow, setMeetingRoom: setMeetingRoom }, dispatch);
  }
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreateNewMeetField)
