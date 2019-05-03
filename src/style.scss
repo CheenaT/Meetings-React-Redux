@@ -288,7 +288,7 @@ progress {
   display: block;
   position: absolute;
   z-index: 999;
-  width: 100%;
+  width: 500%;
   height: 864px;
   color: white;
   font-family: "Poppins";
@@ -570,6 +570,27 @@ progress {
   display: block;
   left: 911px;
   top: 97px;
+}
+.new-meet-create__possible-time {
+  position: absolute;
+  left: 910px;
+  top: 3px;
+  list-style: none;
+  li {
+    // margin-top: 1px;
+    // position: relative;
+    // left: 910px;
+    // top: 117px;
+    border-radius: 4px;
+    width: 72px;
+    height: 38px;
+    line-height: 38px;
+    padding-left: 5px !important;
+    font-size: 14px;
+    text-align: left;
+    color: #000;
+    background: #fff;
+  }
 }
 .new-meet-create__label-date-end {
   position: absolute;

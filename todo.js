@@ -1,7 +1,6 @@
 3. Request to swap time reservation, Request to shift / unshift time
 4. Reepat meet
 10. Add recommended time to recommended meeting room
-17. Add background participants people onHover
 ?14. Forgot to pass guest
 
 13. Choose another meeting room! particial
@@ -17,6 +16,7 @@
 15. Hide plus icon when mousemove on time block and increase progress tag value = 100 if his value >= 90!5
 16. Progress from clicked position!6
 11. Refresh recommended time!7
+17. Add background participants people onHover!8
 
 Add cursor styles
 

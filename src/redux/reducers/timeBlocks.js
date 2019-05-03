@@ -2,7 +2,8 @@ const initialState = {
   timeBlocks: [],
   selectedTimeBlock: -1,
   newMeetWindowShown: false,
-  selectedMeetingRoom: ''
+  selectedMeetingRoom: '',
+  findingParticipant: ''
 }
 
 let q = document.querySelector.bind(document);
@@ -28,6 +29,9 @@ const timeBlocksR = ( state = initialState, action) => {
     }
     case 'SET_MEETING_ROOM': {
       return {...state, selectedMeetingRoom: action.selectedMeetingRoom }
+    }
+    case 'FIND_PARTICIPANT_CHANGE': {
+      return {...state, findingParticipant: action.value }
     }
     default:
       return state

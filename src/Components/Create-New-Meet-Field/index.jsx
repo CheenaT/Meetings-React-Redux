@@ -5,8 +5,11 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { participants, meetingRooms } from '../../constants.js';
 import { connect } from 'react-redux';
-import { addMeet, newMeetWindowShow, setMeetingRoom } from '../../redux/actions';
+import { addMeet, newMeetWindowShow, setMeetingRoom, findingParticipantChange } from '../../redux/actions';
 import { bindActionCreators } from 'redux';
+
+let q = document.querySelector.bind(document),
+    qa =document.querySelectorAll.bind(document);
 
 function importAll(r) {
   return r.keys().map(r);
@@ -33,6 +36,7 @@ class CreateNewMeetField extends React.Component {
         60) < 9 ? '0' : '' ) +               (((((+new Date().toTimeString().slice(3, 5) + 30 + 5) / 5) | 0) * 5) %
         60),
       participantsListIsShown: false,
+      possibleTimeShown: false,
       startDate: new Date(),
       recommendedMeetingRoom: [], //'Unexplored territory, up to 30 people'
       people: {},
@@ -154,11 +158,20 @@ class CreateNewMeetField extends React.Component {
           <label htmlFor="meet-date" className="new-meet-create__label-date-begin">
             Begin
           </label>
+          {
+            this.state.possibleTimeShown &&
+            <ul className="new-meet-create__possible-time" >
+              {Array.apply(null, { length: 3 }).map((el, i) => (
+                <li key={i} >{ i + new Date().getHours() + ':' + (new Date().getMinutes() + i*15) }</li>
+              ))}
+            </ul>
+          }
           <input
             type="time"
             className="new-meet-create__time"
             onChange={(e) => this.onFirstTimeChange(e)}
             value = {this.state.beginTimeValue}
+            onMouseOver={ () => this.setState({ possibleTimeShown: true }) }
           />
           <div className="new-meet-create__hyphen-between-times">—</div>
           <label htmlFor="meet-date" className="new-meet-create__label-date-end">
@@ -171,13 +184,29 @@ class CreateNewMeetField extends React.Component {
             value={this.state.endTimeValue}
           />
           <label htmlFor="select" className="new-meet-create__meet-people-label">People</label>
-          <input placeholder="For example, Elon Musk" type="text" className="new-meet-create__meet-people" onFocus={() => this.onFocusInput()} onBlur={() => this.onBlurInput()} />
+          <input
+            placeholder="For example, Elon Musk"
+            type="text"
+            className="new-meet-create__meet-people"
+            onFocus={() => this.onFocusInput()}
+            onBlur={() => this.onBlurInput()}
+            onChange={ e => this.props.findingParticipantChange(e.target.value) }
+            value={ this.props.timeBlocksR.findingParticipant }
+          />
           { this.state.participantsListIsShown &&
             <div className="new-meet-create__participants-list" >
               <ul className='new-meet-create__meet-people-list'> {console.log(' participants : ', participants)}
-                { participants.map( (el, i) =>
-                    <li key={i} onMouseDown={e => this.addParticipant(e, el.name, i)} ><img src={images[i]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>{el.name}<span>{el.about}</span></li>
-                )} {/* change images[1] to images[i] */}
+                { participants.filter( ({ name }) => name.toLowerCase().indexOf(this.props.timeBlocksR.findingParticipant.toLowerCase()) !== -1 ).map( (el, i) =>
+                    <li
+                      key={i}
+                      onMouseDown={ e => this.addParticipant(e, el.name, i)}
+                      onPointerEnter={ () => ( qa('li')[i].style.background = '#E9ECEF' ) }
+                      onPointerLeave={ () => ( qa('li')[i].style.background = '#FFF' ) }
+                    >
+                      <img src={images[i]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>
+                      {el.name}<span>{el.about}</span>
+                    </li>
+                ) } {/* change images[1] to images[i] */}
                 {/*<li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[1]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Darth Vader<span> &bull; Supreme commander of the Galactic Empire &bull; last floor</span></li>
                 <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[6]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Genghis Khan<span> &bull; CEO and founter of Mongol Empire &bull; 18 floor</span></li>
                 <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[10]} width="24px" height="24px" className="meet-people-list__avatar" alt="terrible hitman"/>Vincent Vega<span> &bull; hitman &bull; 2 floor</span></li>
@@ -302,8 +331,17 @@ const mapStateToProps = state => {
   return
 }*/}
 
-function mapDispatchToProps(dispatch){
-   return bindActionCreators({ addMeet: addMeet, newMeetWindowShow: newMeetWindowShow, setMeetingRoom: setMeetingRoom }, dispatch);
- }
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators(
+    {
+      addMeet: addMeet,
+      newMeetWindowShow: newMeetWindowShow,
+      setMeetingRoom: setMeetingRoom,
+      findingParticipantChange: findingParticipantChange
+    },
+    dispatch
+  );
+}
+
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreateNewMeetField)
