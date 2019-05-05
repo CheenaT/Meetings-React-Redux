@@ -2,6 +2,7 @@
   "name": "meetings",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://cheenat.github.io/Meetings-React-Redux/",
   "dependencies": {
     "formik": "^1.5.2",
     "node-sass": "^4.11.0",
@@ -16,6 +17,8 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

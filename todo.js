@@ -19,7 +19,7 @@
 17. Add background participants people onHover!8
 
 Add cursor styles
-
+dynamic possible time
 
 notes: meetingRoomIsSelected, recommendedMeetingRoom mb needless
 fix current time vertical line

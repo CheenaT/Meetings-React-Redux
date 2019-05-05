@@ -3,7 +3,7 @@ import ButtomArrowIcon from './../../images/buttom-arrow.png';
 import CircleIconWithClose from './../../images/icon-circle-with-close.svg';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { participants, meetingRooms } from '../../constants.js';
+import { participants, floorsWithMeetingRooms } from '../../constants.js';
 import { connect } from 'react-redux';
 import { addMeet, newMeetWindowShow, setMeetingRoom, findingParticipantChange } from '../../redux/actions';
 import { bindActionCreators } from 'redux';
@@ -18,12 +18,8 @@ function importAll(r) {
 const images = importAll(require.context('./../../images', false, /\.(png|jpe?g|svg)$/));
 console.log(' images : ', images);
 
-// const people = [{name: 'Lex'}, {name: 'Wayne'}];
 class CreateNewMeetField extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
+    state = {
       beginTimeValue: (((+new Date().toTimeString().slice(3, 5) > 54 ? 1 : 0) + +new Date().toTimeString().slice(0, 2) ) < 9 ? '0' : 0) +
         ((+new Date().toTimeString().slice(3, 5) > 54 ? 1 : 0) + +new Date().toTimeString().slice(0, 2) ) +
         ":" + (+new Date().toTimeString().slice(3, 5) < 5 || +new Date().toTimeString().slice(3, 5) > 54 ? 0 : '' ) +
@@ -37,33 +33,27 @@ class CreateNewMeetField extends React.Component {
         60),
       participantsListIsShown: false,
       possibleTimeShown: false,
+      possibleEndTimeShown: false,
       startDate: new Date(),
       recommendedMeetingRoom: [], //'Unexplored territory, up to 30 people'
       people: {},
       meetingRoomIsHover: false
     };
-    let hours = new Date().getHours(), { timeBlocksR } = this.props;
-    if ( !this.props.timeBlocksR.selectedMeetingRoom ) {
-      for( let i = 0; i < Object.keys(meetingRooms).length; i++ ) {
-        console.log(' debug timeBlocks : ', timeBlocksR.timeBlocks[hours - 8 + 17 * i]);
-        if ( !timeBlocksR.timeBlocks[hours - 8 + 17 * i] ) {
-          this.state.recommendedMeetingRoom.push(meetingRooms[i]);
-        }
-      }
-    }
-    this.handleChange = this.handleChange.bind(this);
-    // this.onFirstTimeChange = this.onFirstTimeChange.bind(this);
-  }
-  handleChange(date) {
-    this.setState({
-      startDate: date
-    });
-  }
-
   componentDidMount() {
     this.timerID = setInterval( () => this.tick(), 5 * 60 * 1000 );
     console.log(document.getElementById('meet-date'));
     // document.getElementById('meet-date').value = new Date().toJSON().slice(0,10);
+    let hours = new Date().getHours(), freeMeetRooms = [], { timeBlocksR: { selectedMeetingRoom, timeBlocks } } = this.props, i = 0;
+    if ( !selectedMeetingRoom ) {
+      floorsWithMeetingRooms.forEach( floor => {
+        floor.meetingRooms.forEach( el => {
+          if ( !timeBlocks[hours - 8 + 17 * i++] ) {
+            freeMeetRooms.push({ room: el.room, floor: floor.floor })
+          }
+        })
+      })
+      this.setState({ recommendedMeetingRoom: freeMeetRooms });
+    }
   }
   componentWillUnmount() {
     clearInterval(this.timerID);
@@ -83,30 +73,24 @@ class CreateNewMeetField extends React.Component {
         60)
     })
   }
-  onFirstTimeChange(e) {
-    this.setState({ beginTimeValue: e.target.value });
-  }
-  endTimeChange(e) {
-    this.setState({ endTimeValue: e.target.value });
-  }
-  onFocusInput() {
-    this.setState({ participantsListIsShown: true })
-  }
-  onBlurInput() {
-    this.setState({ participantsListIsShown: false })
+  beginTimeChange(e) {
+    let regexTimeFormat =/^(0[0-9]|1[0-9]|2[0-3]|[0-9]):[0-5][0-9]$/;
+    console.log(' number debug : ', regexTimeFormat.test(e.target.value), e.target.value, typeof e.target.value );
+    if ( regexTimeFormat.test(e.target.value) ) {
+      this.setState({ beginTimeValue: e.target.value });
+    }
   }
   hoverMeetingRoom = (e, i) => {
-    let copyRecommendedMeetingRoom = [], hours = new Date().getHours(), { timeBlocksR } = this.props;
-      for( let i = 0; i < Object.keys(meetingRooms).length; i++ ) {
-        console.log(' debug timeBlocks : ', timeBlocksR.timeBlocks[hours - 8 + 17 * i] );
-        if ( !timeBlocksR.timeBlocks[hours - 8 + 17 * i] ) {
-          copyRecommendedMeetingRoom.push(meetingRooms[i]);
-        }
-      }
+      let copyRecommendedMeetingRoom = [], hours = new Date().getHours(), { timeBlocksR: { timeBlocks } } = this.props, j = 0;
+        floorsWithMeetingRooms.forEach( floor => {
+          floor.meetingRooms.forEach( el => {
+            if ( !timeBlocks[hours - 8 + 17 * j++] ) {
+              copyRecommendedMeetingRoom.push({ room: el.room, floor: floor.floor })
+            }
+          })
+        })
+      console.log(' debug copyRecommendedMeetingRoom ', copyRecommendedMeetingRoom);
       this.setState({ recommendedMeetingRoom: copyRecommendedMeetingRoom, meetingRoomIsHover: true });
-  }
-  outMeetingRoom = () => {
-    this.setState({recommendedMeetingRoom: [], meetingRoomIsHover: false });
   }
   addParticipant = (e, name, i) => {
     let newPeople = {...this.state.people, [name]: { name, image: i } }; // change 1 to id
@@ -114,11 +98,12 @@ class CreateNewMeetField extends React.Component {
     console.log(' addParticipant : ', e, name, newPeople, this.state.people);
   }
   render() {
+    const { timeBlocksR: { findingParticipant, selectedMeetingRoom, selectedTimeBlock }, newMeetWindowShow, findingParticipantChange, setMeetingRoom, addMeet } = this.props;
     return (
-      <div>
         <form action="" className="main__new-meet-create">
+          <div className="new-meet-create__form-content" >
           <img
-            onClick={this.props.newMeetWindowShow}
+            onClick={newMeetWindowShow}
             src={CircleIconWithClose} alt=""
             className="new-meet-create__circle-icon-with-close"
           />
@@ -137,7 +122,7 @@ class CreateNewMeetField extends React.Component {
           </label>
           <DatePicker
             selected={this.state.startDate}
-            onChange={this.handleChange}
+            onChange={ (date) => this.setState({ startDate: date }) }
             id="meet-date"
             className="new-meet-create__meet-date"
             dateFormat="d MMMM yyyy"
@@ -161,42 +146,59 @@ class CreateNewMeetField extends React.Component {
           {
             this.state.possibleTimeShown &&
             <ul className="new-meet-create__possible-time" >
-              {Array.apply(null, { length: 3 }).map((el, i) => (
-                <li key={i} >{ i + new Date().getHours() + ':' + (new Date().getMinutes() + i*15) }</li>
+              {Array.apply(null, { length: 5 }).map((el, i) => (
+                <li key={i} >{ (5 - i) + new Date().getHours() + ':'
+                  + ( ( ( +this.state.beginTimeValue.slice(3,5) + (5 - i)*15) % 60) < 10 ? '0' : '' )
+                  + ( +this.state.beginTimeValue.slice(3,5) + (5 - i)*15) % 60 }
+                </li>
+              ))}
+            </ul>
+          }
+          {
+            this.state.possibleEndTimeShown &&
+            <ul className="new-meet-create__possible-end-time" >
+              {Array.apply(null, { length: 5 }).map((el, i) => (
+                <li key={i} >{ (6 - i) + new Date().getHours() + ':'
+                  + ( ( ( +this.state.beginTimeValue.slice(3,5) + (5 - i)*15) % 60) < 10 ? '0' : '' )
+                  + ( +this.state.beginTimeValue.slice(3,5) + (5 - i)*15) % 60 }
+                </li>
               ))}
             </ul>
           }
           <input
-            type="time"
             className="new-meet-create__time"
-            onChange={(e) => this.onFirstTimeChange(e)}
+            type="time"
+            onChange={(e) => this.beginTimeChange(e)}
             value = {this.state.beginTimeValue}
             onMouseOver={ () => this.setState({ possibleTimeShown: true }) }
+            onMouseOut={ () => this.setState({ possibleTimeShown: false }) }
           />
           <div className="new-meet-create__hyphen-between-times">—</div>
           <label htmlFor="meet-date" className="new-meet-create__label-date-end">
             End
           </label>
           <input
-            type="time"
             className="new-meet-create__time"
-            onChange={(e) => this.endTimeChange(e)}
+            type='time'
+            onChange={ e => this.setState({ endTimeValue: e.target.value }) }
             value={this.state.endTimeValue}
+            onMouseOver={ () => this.setState({ possibleEndTimeShown: true }) }
+            onMouseOut={ () => this.setState({ possibleEndTimeShown: false }) }
           />
           <label htmlFor="select" className="new-meet-create__meet-people-label">People</label>
           <input
             placeholder="For example, Elon Musk"
             type="text"
             className="new-meet-create__meet-people"
-            onFocus={() => this.onFocusInput()}
-            onBlur={() => this.onBlurInput()}
-            onChange={ e => this.props.findingParticipantChange(e.target.value) }
-            value={ this.props.timeBlocksR.findingParticipant }
+            onFocus={() => this.setState({ participantsListIsShown: true }) }
+            onBlur={() => this.setState({ participantsListIsShown: false }) }
+            onChange={ e => findingParticipantChange(e.target.value) }
+            value={ findingParticipant }
           />
           { this.state.participantsListIsShown &&
             <div className="new-meet-create__participants-list" >
               <ul className='new-meet-create__meet-people-list'> {console.log(' participants : ', participants)}
-                { participants.filter( ({ name }) => name.toLowerCase().indexOf(this.props.timeBlocksR.findingParticipant.toLowerCase()) !== -1 ).map( (el, i) =>
+                { participants.filter( ({ name }) => name.toLowerCase().indexOf(findingParticipant.toLowerCase()) !== -1 ).map( (el, i) =>
                     <li
                       key={i}
                       onMouseDown={ e => this.addParticipant(e, el.name, i)}
@@ -207,42 +209,6 @@ class CreateNewMeetField extends React.Component {
                       {el.name}<span>{el.about}</span>
                     </li>
                 ) } {/* change images[1] to images[i] */}
-                {/*<li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[1]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Darth Vader<span> &bull; Supreme commander of the Galactic Empire &bull; last floor</span></li>
-                <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[6]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Genghis Khan<span> &bull; CEO and founter of Mongol Empire &bull; 18 floor</span></li>
-                <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[10]} width="24px" height="24px" className="meet-people-list__avatar" alt="terrible hitman"/>Vincent Vega<span> &bull; hitman &bull; 2 floor</span></li>
-                <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[5]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Elon Musk<span> &bull; co-founder, CEO and designer at Tesla and SpaceX &bull; 28 floor</span></li>
-                <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[5]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Neo<span> &bull; The One, ex-software engineer in our Matrix simulation &bull; any floor</span></li>
-                <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[5]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Tom Riddle<span> &bull;  &bull; last floor</span></li>
-                <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[5]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>4</li>
-                <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[5]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Joker founder of insanity</li>
-                <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[5]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Vito Corleone</li>
-                <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[5]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>James Bond</li>
-                <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[5]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Batman</li>
-                <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[5]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Tony Stark</li>
-                <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[5]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Aragorn</li>
-                <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[5]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Gautama Buddha Founder of Buddhism</li>
-                <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[5]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Anton Chigurh &bull; -1 floor</li>
-                <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[5]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Ace Ventura</li>
-                <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[5]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Gabe Newell</li>
-                <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[5]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Yagami Light &bull; God of the new world, also known as justice</li>
-                <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[5]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Dalai Lama</li>
-                <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[5]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Eru Rōraito also known as L</li>
-                <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[5]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Erald Coil second most famous detective in the world </li>
-                <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[5]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Deneuve third most famous detective in the world </li>
-                <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[5]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>The Shinigami King (死神大王, Shinigami Daiō), also known as the King of Death, is the ruler of all Shinigami in the Shinigami Realm </li>
-
-                <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[5]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Mark Lilly &bull; social worker </li>
-                <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[5]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Deneuve third most famous detective in the world </li>
-                <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[5]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Deneuve third most famous detective in the world </li>
-                <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[5]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Deneuve third most famous detective in the world </li>
-                <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[5]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Deneuve third most famous detective in the world </li>
-                <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[5]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>N'aix &bull; main damage dealer</li>
-                <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[5]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>X &bull; Lethal benefit dealer</li>
-                <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[5]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Ramzes666 &bull; </li>
-                <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[5]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Eyes of the Dead God &bull; </li>
-                <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[5]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Dan Abramov &bull; </li>
-                <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[5]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Tyler Durden second personality</li>
-                <li onMouseDown={e => this.addParticipant(e, 'Darth Vader')} ><img src={images[5]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>Ernest Hemingway<span> &bull; last floor</span></li>*/}
               </ul>
               <div className="new-meet-create__hint" >
                 <div className="new-meet-create__hint-text" >hint</div>
@@ -250,75 +216,52 @@ class CreateNewMeetField extends React.Component {
               </div>
             </div>
           }
-          {/*<select name="" id="select" className="new-meet-create__meet-people">
-            <option value="Darth Vader" icon='./../../images/Anakin.jpg' style={{ backgroundImage: "url('http://www.google.com/images/srpr/logo3w.png')" }} >Darth Vader</option>
-            <option value="Ernest Hemingway">Ernest Hemingway</option>
-            <option value="Neo">Neo</option>
-            <option value="Vincent Vega">Vincent Vega</option>
-            <option value="Batman">Batman</option>
-            <option value="Captain Jack Sparrow">Captain Jack Sparrow</option>
-            <option value="Quasimodo">Quasimodo</option>
-            <option value="Shrek">Shrek</option>
-            <option value="Freddy Krueger">Freddy Krueger</option>
-            <option value="Terminator">Terminator</option>
-            <option value="Dr. House">Dr. House</option>
-            <option value="Hawthorne">Hawthorne</option>
-          </select>*/}
-          {/*<div id="image-dropdown" >
-            <input defaultChecked="checked" type="radio" id="line1" name="line-style" value="1"  /><label htmlFor="line1"></label>
-            <input type="radio" id="line2" name="line-style" value="2"  /><label htmlFor="line2" className="label2"></label>
-            <input type="radio" id="line3" name="line-style" value="3"  /><label htmlFor="line3"></label>
-            <input type="radio" id="line4" name="line-style" value="4"  /><label htmlFor="line4"></label>
-            <input type="radio" id="line5" name="line-style" value="5"  /><label htmlFor="line5"></label>
-            <input type="radio" id="line6" name="line-style" value="6"  /><label htmlFor="line6"></label>
-            <input type="radio" id="line7" name="line-style" value="7"  /><label htmlFor="line7"></label>
-          </div>*/}
-          <span className="new-meet-create__recommended-meeting-rooms-text">{this.props.timeBlocksR.selectedMeetingRoom ? 'Meeting room' : 'Recommended meeting room' }{false ? 's' : ''}</span>
-          { this.props.timeBlocksR.selectedMeetingRoom &&
-            <div className="new-meet-create__selected-meeting-room" onMouseOver={this.hoverMeetingRoom} onMouseOut={this.outMeetingRoom} >
-              <img src={ButtomArrowIcon} alt="" className="new-meet-create__buttom-arrow" onMouseOver={this.hoverMeetingRoom} onMouseOut={this.outMeetingRoom} />
-              { this.state.meetingRoomIsHover ? 'Choose another meeting room?' : this.props.timeBlocksR.selectedMeetingRoom}
+          <span className="new-meet-create__recommended-meeting-rooms-text">{selectedMeetingRoom ? 'Meeting room' : 'Recommended meeting room' }{false ? 's' : ''}</span>
+          { selectedMeetingRoom &&
+            <div className="new-meet-create__selected-meeting-room" onMouseOver={this.hoverMeetingRoom} onMouseOut={ () => this.setState({ recommendedMeetingRoom: [], meetingRoomIsHover: false }) } >
+              <img src={ButtomArrowIcon} alt="" className="new-meet-create__buttom-arrow" onMouseOver={this.hoverMeetingRoom} onMouseOut={ () => this.setState({ recommendedMeetingRoom: [], meetingRoomIsHover: false }) } />
+              { this.state.meetingRoomIsHover ? 'Choose another meeting room?' : selectedMeetingRoom}
             </div> }
-            {console.log(' debug condition : ', this.props.timeBlocksR.selectedMeetingRoom, !!this.props.timeBlocksR.selectedMeetingRoom, this.state.meetingRoomIsHover, !!this.state.meetingRoomIsHover )}
-          { ( this.props.timeBlocksR.selectedMeetingRoom && this.state.meetingRoomIsHover ) ?
+            {console.log(' debug condition : ', selectedMeetingRoom, !!selectedMeetingRoom, this.state.meetingRoomIsHover, !!this.state.meetingRoomIsHover )}
+          { ( selectedMeetingRoom && this.state.meetingRoomIsHover ) ?
             this.state.recommendedMeetingRoom.map( (el, i) =>
-                <div key={el} className="new-meet-create__meet-room" >
-                  {el}
+                <div key={i} className="new-meet-create__meet-room" >
+                  {`${this.state.beginTimeValue} — ${this.state.endTimeValue}  `}{el.room + ' • ' + el.floor + ' floor'}
                 </div>
             ) :
             this.state.recommendedMeetingRoom.map( (el, i) =>
-                <div key={el} className="new-meet-create__meet-room" >
-                  {el}
+                <div key={i} className="new-meet-create__meet-room" >
+                  {`${this.state.beginTimeValue} — ${this.state.endTimeValue}  `}{el.room + ' • ' + el.floor + ' floor'}
                 </div>
             )
           }
           <button
             className="new-meet-create__back-button"
-            onClick={() => {this.props.newMeetWindowShow(); this.props.setMeetingRoom() } }
+            onClick={() => {newMeetWindowShow(); setMeetingRoom() } }
           >
             {'Back'}
           </button>
           <button
             className="new-meet-create__create-button"
             onClick={() => {
-              this.props.setMeetingRoom("");
-              this.props.addMeet(this.props.timeBlocksR.selectedTimeBlock);
-              this.props.newMeetWindowShow();
+              setMeetingRoom("");
+              addMeet(selectedTimeBlock);
+              newMeetWindowShow();
             }}
           >
             {"Create"}
           </button> {/* TODO: pass number of time block by time and meeting room */}
-          <div className="invated-people">
+          <div className="invited-people">
             {/*{people.map( el => (<div className="invated-people__participant">{el.name}</div>))}*/}
             {Object.keys(this.state.people).map((keyName, i) => (
-                <div className="invated-people__participant" key={i}>
+                <div className="invited-people__participant" key={i}>
                     {/*<span className="input-label">key: {i} Name: {subjects[keyName]}</span>*/}
                     {this.state.people[keyName].name}
                 </div>
             ))}
           </div>
+          </div>
         </form>
-      </div>
     )
   }
 }
@@ -326,10 +269,6 @@ class CreateNewMeetField extends React.Component {
 const mapStateToProps = state => {
   return { timeBlocksR: state.timeBlocksR }
 }
-
-{/*const mapDispatchToProps = dispatch => {
-  return
-}*/}
 
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators(

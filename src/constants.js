@@ -226,10 +226,10 @@ export const floorsWithMeetingRooms = [
   {
     floor: 2,
     meetingRooms: [
-      { room: "Lomonosov", capacity: "30" },
-      { room: "Pavlov", capacity: "20" },
-      { room: "Kapitza", capacity: "20" },
-      { room: "Tamm 👉", capacity: "10" }
+      { room: "Lomonosov", capacity: 30 },
+      { room: "Pavlov", capacity: 20 },
+      { room: "Kapitza", capacity: 20 },
+      { room: "Tamm 👉", capacity: 10 }
     ]
   },
   {
