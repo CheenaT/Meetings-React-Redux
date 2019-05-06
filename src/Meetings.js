@@ -4,7 +4,7 @@ import RightArrow from "./images/right-pointing-arrow.png";
 import LeftArrow from "./images/left-pointing-arrow.png";
 import CloseButton from "./images/close.svg";
 import { CSSTransitionGroup } from "react-transition-group";
-import CreateNewMeetField from "./Components/Create-New-Meet-Field"
+import CreateNewMeetField from "./Components/Create-New-Meet-Field";
 import { connect } from 'react-redux';
 import { setSelectedTimeBlock, newMeetWindowShow, setMeetingRoom } from './redux/actions';
 import { bindActionCreators } from 'redux';
@@ -64,9 +64,9 @@ class Meetings extends Component {
     }
   }
   showMoreInfoPopup = (e, i) => {
-    console.log(' showMoreInfoPopup ');
+    console.log(' showMoreInfoPopup ', this.props.timeBlocksR.timeBlocks[i]);
     this.setState({ isClicked: true });
-    if( this.state.timeBlocks[i] ) {
+    if( this.props.timeBlocksR.timeBlocks[i] ) {
       if (this.state.moreInfoPopup) {
         this.setState({ moreInfoPopup: false });
         let offsetLeft = e.clientX - q(".main__meeting-rooms").offsetWidth,
@@ -92,41 +92,45 @@ class Meetings extends Component {
     }
   }
   onMouseDown(e, i) {
-    const { timeBlocksR: { selectedTimeBlock }, setSelectedTimeBlock, setMeetingRoom } = this.props;
+    const { timeBlocksR: { selectedTimeBlock, timeBlocks }, setSelectedTimeBlock, setMeetingRoom } = this.props;
 
     this.setState({ isClicked: true }); // find meeting room by clicking on time block
     setMeetingRoom(meetingRooms[Math.floor(i/17)]);
-    console.log(' lastSelected : ', selectedTimeBlock, i);
-    if ( selectedTimeBlock !== -1 && selectedTimeBlock !== i ) { // remove plus icon and backgroundColor from last clicked time block and add it to current clicked time block
+    console.log(' lastSelected : ', selectedTimeBlock, i, timeBlocks[i]);
+    if ( selectedTimeBlock !== -1 && selectedTimeBlock !== i && !timeBlocks[selectedTimeBlock] ) { // remove plus icon and backgroundColor from last clicked time block and add it to current clicked time block
       q(".plus" + selectedTimeBlock).style.display = "none";
       q(".number" + selectedTimeBlock).value = 0;
     }
-    q(".plus" + i).style.display = "block";
-    q(".horizontal" + i).style.display = "block";
-    q(".vertical" + i).style.display = "block";
-    setSelectedTimeBlock(i);
+    if ( !this.props.timeBlocksR.timeBlocks[i] ) {
+      q(".plus" + i).style.display = "block";
+      q(".horizontal" + i).style.display = "block";
+      q(".vertical" + i).style.display = "block";
+      setSelectedTimeBlock(i);
+    }
   }
   isClickedFalse(e, i) {
-    console.log(" onMouseUp : ", this.state.isClicked, i);
-    q(".number" + i).value = 100;
-    q(".plus" + i).style.display = "block";
-    q(".horizontal" + i).style.display = "block";
-    q(".vertical" + i).style.display = "block";
-    let offsetLeft =
-        Math.ceil((e.clientX - q(".main__meeting-rooms").offsetWidth) / 75) * 75 +
-        Math.ceil((e.clientX - q(".main__meeting-rooms").offsetWidth) / 75) +
-        5,
-    offsetTop =
-        47 + Math.floor(i / 17) * 51.6 + (Math.floor(i / 17) > 3 ? 30.4 : 0) - 12;
-    offsetLeft = offsetLeft + 360 + q(".main__meeting-rooms").offsetWidth > window.innerWidth
-        ? Math.floor((e.clientX - q(".main__meeting-rooms").offsetWidth) / 75) * 75 - 360 +
-          (Math.floor((e.clientX - q(".main__meeting-rooms").offsetWidth) / 75) - 1) - 5
-        : offsetLeft;
-    setTimeout( () => {
-      this.setState({ isClicked: false, isHiddenPopup: true });
-      q(".meeting-schedule__popup").style.left = offsetLeft + "px";
-      q(".meeting-schedule__popup").style.top = offsetTop + "px";
-    }, 0);
+    console.log(" onMouseUp : ", !!this.props.timeBlocksR.timeBlocks[i], i);
+    if ( !this.props.timeBlocksR.timeBlocks[i] ) {
+      q(".number" + i).value = 100;
+      q(".plus" + i).style.display = "block";
+      q(".horizontal" + i).style.display = "block";
+      q(".vertical" + i).style.display = "block";
+      let offsetLeft =
+          Math.ceil((e.clientX - q(".main__meeting-rooms").offsetWidth) / 75) * 75 +
+          Math.ceil((e.clientX - q(".main__meeting-rooms").offsetWidth) / 75) +
+          5,
+      offsetTop =
+          47 + Math.floor(i / 17) * 51.6 + (Math.floor(i / 17) > 3 ? 30.4 : 0) - 12;
+      offsetLeft = offsetLeft + 360 + q(".main__meeting-rooms").offsetWidth > window.innerWidth
+          ? Math.floor((e.clientX - q(".main__meeting-rooms").offsetWidth) / 75) * 75 - 360 +
+            (Math.floor((e.clientX - q(".main__meeting-rooms").offsetWidth) / 75) - 1) - 5
+          : offsetLeft;
+      setTimeout( () => {
+        this.setState({ isClicked: false, isHiddenPopup: true });
+        q(".meeting-schedule__popup").style.left = offsetLeft + "px";
+        q(".meeting-schedule__popup").style.top = offsetTop + "px";
+      }, 0);
+    }
   }
   preventDefault(e) {
     e.preventDefault();
@@ -146,8 +150,7 @@ class Meetings extends Component {
           <div className="header__text">Meetings</div>
           {/*<input className="header__order-pass-if-forgot-someone"></input>*/}
           <button className="header__button-create-meeting" onClick={() => { this.newMeetCreate(); newMeetWindowShow() }}>
-            { newMeetWindowShown && 'cancel meet' }
-            { !newMeetWindowShown && 'new meet' } {/* or mb 'new meeting'*/}
+            { newMeetWindowShown ? 'cancel meet' : 'new meet' } {/* or mb 'new meeting'*/}
           </button>
         </header>
         <div className="main">

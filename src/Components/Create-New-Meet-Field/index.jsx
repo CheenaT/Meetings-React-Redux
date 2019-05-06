@@ -20,17 +20,8 @@ console.log(' images : ', images);
 
 class CreateNewMeetField extends React.Component {
     state = {
-      beginTimeValue: (((+new Date().toTimeString().slice(3, 5) > 54 ? 1 : 0) + +new Date().toTimeString().slice(0, 2) ) < 9 ? '0' : 0) +
-        ((+new Date().toTimeString().slice(3, 5) > 54 ? 1 : 0) + +new Date().toTimeString().slice(0, 2) ) +
-        ":" + (+new Date().toTimeString().slice(3, 5) < 5 || +new Date().toTimeString().slice(3, 5) > 54 ? 0 : '' ) +
-        (((((+new Date().toTimeString().slice(3, 5) + 5) / 5) | 0) * 5) % 60),
-      endTimeValue: ((       +new Date().toTimeString().slice(0, 2) +
-      (+new Date().toTimeString().slice(3, 5) + 30 > 54 ? 1 : 0)) % 24 === 0 ? '0' : '') + (       +new Date().toTimeString().slice(0, 2) +
-      (+new Date().toTimeString().slice(3, 5) + 30 > 54 ? 1 : 0)) % 24 +
-      ":" +
-        ( (((((+new Date().toTimeString().slice(3, 5) + 30 + 5) / 5) | 0) * 5) %
-        60) < 9 ? '0' : '' ) +               (((((+new Date().toTimeString().slice(3, 5) + 30 + 5) / 5) | 0) * 5) %
-        60),
+      beginTimeValue: new Date(Math.ceil(new Date().getTime() / (60*1000*5) ) * 60*1000*5).toTimeString().slice(0,5),
+      endTimeValue: new Date(Math.ceil(new Date(new Date().setMinutes(new Date().getMinutes() + 30)).getTime() / (60*1000*5) ) * 60*1000*5).toTimeString().slice(0,5),
       participantsListIsShown: false,
       possibleTimeShown: false,
       possibleEndTimeShown: false,
@@ -60,17 +51,8 @@ class CreateNewMeetField extends React.Component {
   }
   tick = () => {
     this.setState({
-      beginTimeValue: (((+new Date().toTimeString().slice(3, 5) > 54 ? 1 : 0) + +new Date().toTimeString().slice(0, 2) ) < 9 ? '0' : 0) +
-        ((+new Date().toTimeString().slice(3, 5) > 54 ? 1 : 0) + +new Date().toTimeString().slice(0, 2) ) +
-        ":" + (+new Date().toTimeString().slice(3, 5) < 5 || +new Date().toTimeString().slice(3, 5) > 54 ? 0 : '' ) +
-        (((((+new Date().toTimeString().slice(3, 5) + 5) / 5) | 0) * 5) % 60),
-      endTimeValue: ((       +new Date().toTimeString().slice(0, 2) +
-      (+new Date().toTimeString().slice(3, 5) + 30 > 54 ? 1 : 0)) % 24 === 0 ? '0' : '') + (       +new Date().toTimeString().slice(0, 2) +
-      (+new Date().toTimeString().slice(3, 5) + 30 > 54 ? 1 : 0)) % 24 +
-      ":" +
-        ( (((((+new Date().toTimeString().slice(3, 5) + 30 + 5) / 5) | 0) * 5) %
-        60) < 9 ? '0' : '' ) +               (((((+new Date().toTimeString().slice(3, 5) + 30 + 5) / 5) | 0) * 5) %
-        60)
+      beginTimeValue: new Date(Math.ceil(new Date().getTime() / (60*1000*5) ) * 60*1000*5).toTimeString().slice(0,5),
+      endTimeValue: new Date(Math.ceil(new Date(new Date().setMinutes(new Date().getMinutes() + 30)).getTime() / (60*1000*5) ) * 60*1000*5).toTimeString().slice(0,5)
     })
   }
   beginTimeChange(e) {
@@ -145,20 +127,20 @@ class CreateNewMeetField extends React.Component {
           </label>
           {
             this.state.possibleTimeShown &&
-            <ul className="new-meet-create__possible-time" >
+            <ul
+              onMouseOver={ () => this.setState({ possibleTimeShown: 1 }) }
+              onMouseLeave={ () => this.setState({ possibleTimeShown: false }) }
+              onClick={ (e) => { console.log(' debug onClick : ', e.target.innerText ); this.setState({ beginTimeValue: e.target.innerText, possibleTimeShown: false }); } }
+              className="new-meet-create__possible-time" >
               {Array.apply(null, { length: 5 }).map((el, i) => (
-                <li key={i} >{ (5 - i) + new Date().getHours() + ':'
-                  + ( ( ( +this.state.beginTimeValue.slice(3,5) + (5 - i)*15) % 60) < 10 ? '0' : '' )
-                  + ( +this.state.beginTimeValue.slice(3,5) + (5 - i)*15) % 60 }
-                </li>
-              ))}
-            </ul>
-          }
-          {
-            this.state.possibleEndTimeShown &&
-            <ul className="new-meet-create__possible-end-time" >
-              {Array.apply(null, { length: 5 }).map((el, i) => (
-                <li key={i} >{ (6 - i) + new Date().getHours() + ':'
+                <li
+                  onPointerEnter={ () => ( qa('li')[i].style.background = '#E9ECEF' ) }
+                  onPointerLeave={ () => ( qa('li')[i].style.background = '#FFF' ) }
+                  key={i}
+                > { console.log(' debug possibleTime : ', ((((5 - i) + new Date().getHours()) % 24) < 10 ? '0' : +'' ) + ((5 - i) + new Date().getHours()) % 24 + ':'
+                + ( ( ( +this.state.beginTimeValue.slice(3,5) + (5 - i)*30) % 60) < 10 ? '0' : '' )
+                + ( +this.state.beginTimeValue.slice(3,5) + (5 - i)*30) % 60) }
+                  { ((((5 - i) + new Date().getHours()) % 24) < 10 ? '0' : +'' ) + ((5 - i) + new Date().getHours()) % 24 + ':'
                   + ( ( ( +this.state.beginTimeValue.slice(3,5) + (5 - i)*15) % 60) < 10 ? '0' : '' )
                   + ( +this.state.beginTimeValue.slice(3,5) + (5 - i)*15) % 60 }
                 </li>
@@ -171,9 +153,20 @@ class CreateNewMeetField extends React.Component {
             onChange={(e) => this.beginTimeChange(e)}
             value = {this.state.beginTimeValue}
             onMouseOver={ () => this.setState({ possibleTimeShown: true }) }
-            onMouseOut={ () => this.setState({ possibleTimeShown: false }) }
+            onMouseOut={ () => { setTimeout( () => { if (this.state.possibleTimeShown !== 1) { this.setState({ possibleTimeShown: false }) } }, 200) } }
           />
           <div className="new-meet-create__hyphen-between-times">—</div>
+          {
+            this.state.possibleEndTimeShown &&
+            <ul className="new-meet-create__possible-end-time" >
+              {Array.apply(null, { length: 5 }).map((el, i) => (
+                <li key={i} >{ (6 - i) + new Date().getHours() + ':'
+                  + ( ( ( +this.state.beginTimeValue.slice(3,5) + (5 - i)*15) % 60) < 10 ? '0' : '' )
+                  + ( +this.state.beginTimeValue.slice(3,5) + (5 - i)*15) % 60 }
+                </li>
+              ))}
+            </ul>
+          }
           <label htmlFor="meet-date" className="new-meet-create__label-date-end">
             End
           </label>

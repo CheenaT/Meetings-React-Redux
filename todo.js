@@ -24,3 +24,5 @@ dynamic possible time
 notes: meetingRoomIsSelected, recommendedMeetingRoom mb needless
 fix current time vertical line
 fixed but with if ( !timeBlocksR.timeBlocks[hours - 8 + 17 * i] )
+
+current: fixed onClick on reserved timeblock
