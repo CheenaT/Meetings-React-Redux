@@ -1,15 +1,15 @@
 import React from "react";
 import ButtomArrowIcon from './../../images/buttom-arrow.png';
-import CircleIconWithClose from './../../images/icon-circle-with-close.svg';
+import CircleIconWithClose from './../../images/error.svg';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { participants, floorsWithMeetingRooms } from '../../constants.js';
 import { connect } from 'react-redux';
 import { addMeet, newMeetWindowShow, setMeetingRoom, findingParticipantChange } from '../../redux/actions';
 import { bindActionCreators } from 'redux';
+import isEmpty from 'lodash/isEmpty';
 
-let q = document.querySelector.bind(document),
-    qa =document.querySelectorAll.bind(document);
+let qa =document.querySelectorAll.bind(document);
 
 function importAll(r) {
   return r.keys().map(r);
@@ -20,8 +20,8 @@ console.log(' images : ', images);
 
 class CreateNewMeetField extends React.Component {
     state = {
-      beginTimeValue: new Date(Math.ceil(new Date().getTime() / (60*1000*5) ) * 60*1000*5).toTimeString().slice(0,5),
-      endTimeValue: new Date(Math.ceil(new Date(new Date().setMinutes(new Date().getMinutes() + 30)).getTime() / (60*1000*5) ) * 60*1000*5).toTimeString().slice(0,5),
+      beginTimeValue: new Date(Math.ceil(new Date().getTime() / (60*1000*5) ) * 60*1000*5),
+      endTimeValue: new Date(Math.ceil(new Date(new Date().setMinutes(new Date().getMinutes() + 30)).getTime() / (60*1000*5) ) * 60*1000*5),
       participantsListIsShown: false,
       possibleTimeShown: false,
       possibleEndTimeShown: false,
@@ -31,19 +31,31 @@ class CreateNewMeetField extends React.Component {
       meetingRoomIsHover: false
     };
   componentDidMount() {
+    const { beginTimeValue, endTimeValue } = this.state,
+            mins = beginTimeValue.getHours() * 60 + beginTimeValue.getMinutes(),
+            endTimeMins = endTimeValue.getHours() * 60 + +endTimeValue.getMinutes();
     this.timerID = setInterval( () => this.tick(), 5 * 60 * 1000 );
-    console.log(document.getElementById('meet-date'));
-    // document.getElementById('meet-date').value = new Date().toJSON().slice(0,10);
-    let hours = new Date().getHours(), freeMeetRooms = [], { timeBlocksR: { selectedMeetingRoom, timeBlocks } } = this.props, i = 0;
+    console.log(' didMount : ', beginTimeValue.getHours() * 60 + beginTimeValue.getMinutes(), endTimeMins );
+    if ( 30 < mins && mins < 480 ) {
+      this.setState({ beginTimeValue: new Date(new Date(Math.ceil(new Date().getTime() / (60*1000*5) ) * 60*1000*5).setHours(8,0)) });
+    }
+    if ( 30 < endTimeMins && endTimeMins < 480 ) {
+      this.setState({ endTimeValue: new Date(new Date().setHours(8,30)) });
+    }
+    const { timeBlocksR: { selectedMeetingRoom } } = this.props;
     if ( !selectedMeetingRoom ) {
-      floorsWithMeetingRooms.forEach( floor => {
-        floor.meetingRooms.forEach( el => {
-          if ( !timeBlocks[hours - 8 + 17 * i++] ) {
-            freeMeetRooms.push({ room: el.room, floor: floor.floor })
-          }
-        })
-      })
-      this.setState({ recommendedMeetingRoom: freeMeetRooms });
+      this.hoverMeetingRoom();
+    }
+  }
+  componentDidUpdate() {
+    const { beginTimeValue, endTimeValue } = this.state,
+            mins = beginTimeValue.getHours() * 60 + beginTimeValue.getMinutes(),
+            endTimeMins = endTimeValue.getHours() * 60 + +endTimeValue.getMinutes();
+    if ( 30 < mins && mins < 480 ) {
+      this.setState({ beginTimeValue: new Date(new Date(Math.ceil(new Date().getTime() / (60*1000*5) ) * 60*1000*5).setHours(8,0)) });
+    }
+    if ( 30 < endTimeMins && endTimeMins < 480 ) {
+      this.setState({ endTimeValue: new Date(new Date().setHours(8,30)) });
     }
   }
   componentWillUnmount() {
@@ -51,8 +63,8 @@ class CreateNewMeetField extends React.Component {
   }
   tick = () => {
     this.setState({
-      beginTimeValue: new Date(Math.ceil(new Date().getTime() / (60*1000*5) ) * 60*1000*5).toTimeString().slice(0,5),
-      endTimeValue: new Date(Math.ceil(new Date(new Date().setMinutes(new Date().getMinutes() + 30)).getTime() / (60*1000*5) ) * 60*1000*5).toTimeString().slice(0,5)
+      beginTimeValue: new Date(Math.ceil(new Date().getTime() / (60*1000*5) ) * 60*1000*5),
+      endTimeValue: new Date(Math.ceil(new Date(new Date().setMinutes(new Date().getMinutes() + 30)).getTime() / (60*1000*5) ) * 60*1000*5)
     })
   }
   beginTimeChange(e) {
@@ -64,15 +76,20 @@ class CreateNewMeetField extends React.Component {
   }
   hoverMeetingRoom = (e, i) => {
       let copyRecommendedMeetingRoom = [], hours = new Date().getHours(), { timeBlocksR: { timeBlocks } } = this.props, j = 0;
+      if ( hours === 0 ) {
+        hours = 24;
+      }
         floorsWithMeetingRooms.forEach( floor => {
           floor.meetingRooms.forEach( el => {
+            console.log(' debug free meetingRooms : ', timeBlocks[hours - 8 + 17 * j], hours - 8 + 17 * j, hours, j );
             if ( !timeBlocks[hours - 8 + 17 * j++] ) {
               copyRecommendedMeetingRoom.push({ room: el.room, floor: floor.floor })
             }
           })
         })
-      console.log(' debug copyRecommendedMeetingRoom ', copyRecommendedMeetingRoom);
-      this.setState({ recommendedMeetingRoom: copyRecommendedMeetingRoom, meetingRoomIsHover: true });
+      console.log(' debug "free" copyRecommendedMeetingRoom ', copyRecommendedMeetingRoom);
+      this.setState({ recommendedMeetingRoom: copyRecommendedMeetingRoom });
+      // rmrs.filter( (el, i) => !tbs[ hours - 8 + 17 * i ] )
   }
   addParticipant = (e, name, i) => {
     let newPeople = {...this.state.people, [name]: { name, image: i } }; // change 1 to id
@@ -80,9 +97,10 @@ class CreateNewMeetField extends React.Component {
     console.log(' addParticipant : ', e, name, newPeople, this.state.people);
   }
   render() {
-    const { timeBlocksR: { findingParticipant, selectedMeetingRoom, selectedTimeBlock }, newMeetWindowShow, findingParticipantChange, setMeetingRoom, addMeet } = this.props;
+    const { timeBlocksR: { findingParticipant, selectedMeetingRoom, selectedTimeBlock }, newMeetWindowShow, findingParticipantChange, setMeetingRoom, addMeet } = this.props,
+          { beginTimeValue, endTimeValue, meetingRoomIsHover, participantsListIsShown, people, possibleEndTimeShown, possibleTimeShown, recommendedMeetingRoom, startDate } = this.state;
     return (
-        <form action="" className="main__new-meet-create">
+        <div className="main__new-meet-create">
           <div className="new-meet-create__form-content" >
           <img
             onClick={newMeetWindowShow}
@@ -103,7 +121,7 @@ class CreateNewMeetField extends React.Component {
             Date
           </label>
           <DatePicker
-            selected={this.state.startDate}
+            selected={startDate}
             onChange={ (date) => this.setState({ startDate: date }) }
             id="meet-date"
             className="new-meet-create__meet-date"
@@ -126,45 +144,123 @@ class CreateNewMeetField extends React.Component {
             Begin
           </label>
           {
-            this.state.possibleTimeShown &&
+            possibleTimeShown &&
             <ul
               onMouseOver={ () => this.setState({ possibleTimeShown: 1 }) }
               onMouseLeave={ () => this.setState({ possibleTimeShown: false }) }
-              onClick={ (e) => { console.log(' debug onClick : ', e.target.innerText ); this.setState({ beginTimeValue: e.target.innerText, possibleTimeShown: false }); } }
+              onClick={ (e) => {
+                 const hours = +e.target.innerText.slice(0,2),
+                        mins = +e.target.innerText.slice(3,5);
+                 console.log(' debug innerText : ', e.target.innerText, new Date().setHours(e.target.innerText.slice(0,2),
+                 e.target.innerText.slice(3,5) ), hours, mins, new Date(new Date().setHours(hours, mins + 30)) );
+                 this.setState({ beginTimeValue: new Date(new Date().setHours(hours, mins)), endTimeValue: new Date(new Date().setHours(hours, mins + 30)), possibleTimeShown: false });
+                 setTimeout( () => this.hoverMeetingRoom(), 0)
+               } }
               className="new-meet-create__possible-time" >
-              {Array.apply(null, { length: 5 }).map((el, i) => (
-                <li
-                  onPointerEnter={ () => ( qa('li')[i].style.background = '#E9ECEF' ) }
-                  onPointerLeave={ () => ( qa('li')[i].style.background = '#FFF' ) }
-                  key={i}
-                > { console.log(' debug possibleTime : ', ((((5 - i) + new Date().getHours()) % 24) < 10 ? '0' : +'' ) + ((5 - i) + new Date().getHours()) % 24 + ':'
-                + ( ( ( +this.state.beginTimeValue.slice(3,5) + (5 - i)*30) % 60) < 10 ? '0' : '' )
-                + ( +this.state.beginTimeValue.slice(3,5) + (5 - i)*30) % 60) }
-                  { ((((5 - i) + new Date().getHours()) % 24) < 10 ? '0' : +'' ) + ((5 - i) + new Date().getHours()) % 24 + ':'
-                  + ( ( ( +this.state.beginTimeValue.slice(3,5) + (5 - i)*15) % 60) < 10 ? '0' : '' )
-                  + ( +this.state.beginTimeValue.slice(3,5) + (5 - i)*15) % 60 }
-                </li>
-              ))}
+              {Array.apply(null, { length: 5 }).map((el, i) => {
+                const possibleTime = new Date(
+                  new Date(beginTimeValue).setMinutes(
+                    Math.ceil( (new Date(beginTimeValue).getMinutes() + 1) / 30) * 30 + (5 - i) * 30
+                  )
+                );
+                const mins = possibleTime.getHours() * 60 + possibleTime.getMinutes();
+                const diff = 60 < mins && mins < 480 ? 420 : 0;
+                console.log( ' debug possibleTime : ', possibleTime, mins, diff, possibleTime.getHours(), possibleTime.getMinutes() );
+                return (
+                  <li
+                    onPointerEnter={ () => ( qa('li')[i].style.background = '#E9ECEF' ) }
+                    onPointerLeave={ () => ( qa('li')[i].style.background = '#FFF' ) }
+                    key={i}
+                  > { console.log(' debug possible time : ', new Date(new Date(beginTimeValue).setMinutes(Math.ceil(new Date(beginTimeValue).getMinutes()/30) * 30 + (4 - i)*30)).toString().slice(16, 21) )}
+                    {
+                          new Date(
+                            new Date(beginTimeValue).setMinutes(
+                              Math.ceil( (new Date(beginTimeValue).getMinutes() + 1) / 30) *
+                                30 +
+                                (4 - i) * 30 +
+                                diff
+                            )
+                          )
+                            .toString()
+                            .slice(16, 21)
+                    }
+                  </li>
+                )
+              })}
             </ul>
           }
           <input
             className="new-meet-create__time"
             type="time"
             onChange={(e) => this.beginTimeChange(e)}
-            value = {this.state.beginTimeValue}
+            value = { beginTimeValue.toTimeString().slice(0,5) }
             onMouseOver={ () => this.setState({ possibleTimeShown: true }) }
             onMouseOut={ () => { setTimeout( () => { if (this.state.possibleTimeShown !== 1) { this.setState({ possibleTimeShown: false }) } }, 200) } }
-          />
+          /> {console.log(' debug typeof beginTimeValue : ', beginTimeValue, typeof beginTimeValue.toString(), typeof beginTimeValue, beginTimeValue.toString().length)}
           <div className="new-meet-create__hyphen-between-times">—</div>
           {
-            this.state.possibleEndTimeShown &&
-            <ul className="new-meet-create__possible-end-time" >
-              {Array.apply(null, { length: 5 }).map((el, i) => (
-                <li key={i} >{ (6 - i) + new Date().getHours() + ':'
-                  + ( ( ( +this.state.beginTimeValue.slice(3,5) + (5 - i)*15) % 60) < 10 ? '0' : '' )
-                  + ( +this.state.beginTimeValue.slice(3,5) + (5 - i)*15) % 60 }
-                </li>
-              ))}
+            possibleEndTimeShown &&
+            <ul
+              onClick={(e) => {
+                const hours = e.target.innerText.slice(0,2),
+                       mins = e.target.innerText.slice(3,5);
+                // console.log(' debug innerText : ', e.target.innerText, new Date().setHours(e.target.innerText.slice(0,2), e.target.innerText.slice(3,5) ) );
+                this.setState({ endTimeValue: new Date(new Date().setHours(hours, mins)), possibleEndTimeShown: false });
+                setTimeout( () => this.hoverMeetingRoom(), 0)
+              }}
+              onMouseOver={ () => this.setState({ possibleEndTimeShown: 2 }) }
+              onMouseLeave={ () => this.setState({ possibleEndTimeShown: false }) }
+              className="new-meet-create__possible-end-time"
+            >
+            {
+              Array.apply(null, { length: 5 }).map((el, i) => {
+                const possibleTime = new Date(
+                  new Date(endTimeValue).setMinutes(
+                    Math.ceil((new Date(endTimeValue).getMinutes() + 1) / 30) * 30 +
+                      (5 - i) * 30
+                  )
+                );
+                const mins = possibleTime.getHours() * 60 + possibleTime.getMinutes();
+                const diff = 60 < mins && mins < 480 ? 420 : 0;
+                console.log(
+                  " debug possibleTime : ",
+                  possibleTime,
+                  mins,
+                  diff,
+                  possibleTime.getHours(),
+                  possibleTime.getMinutes()
+                );
+                return (
+                  <li
+                    onPointerEnter={() => (qa("li")[i].style.background = "#E9ECEF")}
+                    onPointerLeave={() => (qa("li")[i].style.background = "#FFF")}
+                    key={i}
+                  >
+                    {" "}
+                    {console.log(
+                      " debug possible time : ",
+                      new Date(
+                        new Date(endTimeValue).setMinutes(
+                          Math.ceil(new Date(endTimeValue).getMinutes() / 30) * 30 +
+                            (4 - i) * 30
+                        )
+                      )
+                        .toString()
+                        .slice(16, 21)
+                    )}
+                    {new Date(
+                      new Date(endTimeValue).setMinutes(
+                        Math.ceil((new Date(endTimeValue).getMinutes() + 1) / 30) * 30 +
+                          (4 - i) * 30 +
+                          diff
+                      )
+                    )
+                      .toString()
+                      .slice(16, 21)}
+                  </li>
+                )
+              })
+            }
             </ul>
           }
           <label htmlFor="meet-date" className="new-meet-create__label-date-end">
@@ -174,23 +270,33 @@ class CreateNewMeetField extends React.Component {
             className="new-meet-create__time"
             type='time'
             onChange={ e => this.setState({ endTimeValue: e.target.value }) }
-            value={this.state.endTimeValue}
-            onMouseOver={ () => this.setState({ possibleEndTimeShown: true }) }
-            onMouseOut={ () => this.setState({ possibleEndTimeShown: false }) }
-          />
+            value={ endTimeValue.toTimeString().slice(0,5) }
+            onMouseOver={ () => this.setState({ possibleEndTimeShown: 1 }) }
+            onMouseOut={ () => { setTimeout( () => { if (this.state.possibleEndTimeShown === 1) { this.setState({ possibleEndTimeShown: false }) } }, 200) } }
+          /> {console.log(" debug endTimeValue sdfsdfsd : ", endTimeValue )}
           <label htmlFor="select" className="new-meet-create__meet-people-label">People</label>
           <input
             placeholder="For example, Elon Musk"
             type="text"
             className="new-meet-create__meet-people"
-            onFocus={() => this.setState({ participantsListIsShown: true }) }
+            onFocus={() => this.setState({ participantsListIsShown: 3 }) }
             onBlur={() => this.setState({ participantsListIsShown: false }) }
+            onMouseOver={ () => { if (participantsListIsShown !== 3) this.setState({ participantsListIsShown: 1 }) } }
+            onMouseOut={ () => {
+              setTimeout( () => {
+                if ( this.state.participantsListIsShown !== 3 && this.state.participantsListIsShown !== 2) {
+                  this.setState({ participantsListIsShown: false })
+                } }, 300)
+            } }
             onChange={ e => findingParticipantChange(e.target.value) }
             value={ findingParticipant }
           />
-          { this.state.participantsListIsShown &&
-            <div className="new-meet-create__participants-list" >
-              <ul className='new-meet-create__meet-people-list'> {console.log(' participants : ', participants)}
+          { participantsListIsShown &&
+            <div
+              className="new-meet-create__participants-list"
+              onMouseOver={ () => { if (participantsListIsShown !== 3) this.setState({ participantsListIsShown: 2 }) }}
+            >
+              <ul className='new-meet-create__meet-people-list' > {console.log(' participants : ', participants)}
                 { participants.filter( ({ name }) => name.toLowerCase().indexOf(findingParticipant.toLowerCase()) !== -1 ).map( (el, i) =>
                     <li
                       key={i}
@@ -199,7 +305,7 @@ class CreateNewMeetField extends React.Component {
                       onPointerLeave={ () => ( qa('li')[i].style.background = '#FFF' ) }
                     >
                       <img src={images[i]} width="24px" height="24px" className="meet-people-list__avatar" alt=""/>
-                      {el.name}<span>{el.about}</span>
+                      {el.name}<span>{el.about}{people[el.name] && <b className="meet-people-list__added" > added</b>}</span>
                     </li>
                 ) } {/* change images[1] to images[i] */}
               </ul>
@@ -209,25 +315,68 @@ class CreateNewMeetField extends React.Component {
               </div>
             </div>
           }
-          <span className="new-meet-create__recommended-meeting-rooms-text">{selectedMeetingRoom ? 'Meeting room' : 'Recommended meeting room' }{false ? 's' : ''}</span>
-          { selectedMeetingRoom &&
-            <div className="new-meet-create__selected-meeting-room" onMouseOver={this.hoverMeetingRoom} onMouseOut={ () => this.setState({ recommendedMeetingRoom: [], meetingRoomIsHover: false }) } >
-              <img src={ButtomArrowIcon} alt="" className="new-meet-create__buttom-arrow" onMouseOver={this.hoverMeetingRoom} onMouseOut={ () => this.setState({ recommendedMeetingRoom: [], meetingRoomIsHover: false }) } />
-              { this.state.meetingRoomIsHover ? 'Choose another meeting room?' : selectedMeetingRoom}
-            </div> }
-            {console.log(' debug condition : ', selectedMeetingRoom, !!selectedMeetingRoom, this.state.meetingRoomIsHover, !!this.state.meetingRoomIsHover )}
-          { ( selectedMeetingRoom && this.state.meetingRoomIsHover ) ?
-            this.state.recommendedMeetingRoom.map( (el, i) =>
-                <div key={i} className="new-meet-create__meet-room" >
-                  {`${this.state.beginTimeValue} — ${this.state.endTimeValue}  `}{el.room + ' • ' + el.floor + ' floor'}
-                </div>
-            ) :
-            this.state.recommendedMeetingRoom.map( (el, i) =>
-                <div key={i} className="new-meet-create__meet-room" >
-                  {`${this.state.beginTimeValue} — ${this.state.endTimeValue}  `}{el.room + ' • ' + el.floor + ' floor'}
-                </div>
+          <span className="new-meet-create__recommended-meeting-rooms-text">
+            {selectedMeetingRoom ? "Meeting room" : "Recommended meeting room"}
+            { recommendedMeetingRoom.length > 1 ? "s" : ""}
+          </span>
+          {
+            selectedMeetingRoom && (
+              <div
+                className="new-meet-create__selected-meeting-room"
+                onMouseOver={ () => { this.hoverMeetingRoom(); this.setState({ meetingRoomIsHover: 1 }) } }
+                onMouseOut={ () => {
+                  setTimeout( () => {
+                    if ( this.state.meetingRoomIsHover === 1 ) {
+                      this.setState({ recommendedMeetingRoom: [], meetingRoomIsHover: false })
+                    } }, 200)
+                } }
+              >
+                <img
+                  src={ButtomArrowIcon}
+                  alt=""
+                  className="new-meet-create__buttom-arrow"
+                  onMouseOver={ () => { this.hoverMeetingRoom(); this.setState({ meetingRoomIsHover: true }) } }
+                  onMouseOut={() =>
+                    this.setState({
+                      recommendedMeetingRoom: [],
+                      meetingRoomIsHover: false
+                    })
+                  }
+                />
+              {
+                meetingRoomIsHover ? "Choose another meeting room?" : selectedMeetingRoom
+              }
+              </div>
             )
           }
+          {
+            !selectedMeetingRoom && <div className="new-meet-create__selected-meeting-room" >{"Сhoose meeting room"}</div>
+          }
+            {console.log(' debug condition : ', selectedMeetingRoom, !!selectedMeetingRoom, meetingRoomIsHover, !!meetingRoomIsHover, selectedMeetingRoom && meetingRoomIsHover )}
+          <ul
+            className="new-meet-create__meet-rooms"
+            onMouseOver={ () => { this.setState({ meetingRoomIsHover: 2 }) }}
+            onMouseLeave={ () => { setTimeout( () => { if (this.state.meetingRoomIsHover === 2 && selectedMeetingRoom ) { this.setState({ recommendedMeetingRoom: [], meetingRoomIsHover: false }) } }, 200) } }
+          >
+          { ( meetingRoomIsHover && selectedMeetingRoom ) ?
+            recommendedMeetingRoom.map( (el, i) =>
+                <li
+                  key={i}
+                  className="new-meet-create__meet-room"
+                  onClick={ () => { this.setState({ recommendedMeetingRoom: [], meetingRoomIsHover: false }); setMeetingRoom(el.room); } }
+                >
+                  {`${beginTimeValue.toTimeString().slice(0,5)} — ${endTimeValue.toTimeString().slice(0,5)}  `}{el.room + ' • ' + el.floor + ' floor'}
+                </li>
+            ) :
+            recommendedMeetingRoom.map( (el, i) =>
+                <li key={i} className="new-meet-create__meet-room"
+                  onClick={ () => { this.setState({ recommendedMeetingRoom: [], meetingRoomIsHover: false }); setMeetingRoom(el.room); } }
+                >
+                  {`${beginTimeValue.toTimeString().slice(0,5)} — ${endTimeValue.toTimeString().slice(0,5)}  `}{el.room + ' • ' + el.floor + ' floor'}
+                </li>
+            )
+          }
+          </ul>
           <button
             className="new-meet-create__back-button"
             onClick={() => {newMeetWindowShow(); setMeetingRoom() } }
@@ -237,24 +386,31 @@ class CreateNewMeetField extends React.Component {
           <button
             className="new-meet-create__create-button"
             onClick={() => {
-              setMeetingRoom("");
-              addMeet(selectedTimeBlock);
-              newMeetWindowShow();
+              if ( selectedMeetingRoom ) {
+                if ( isEmpty(people) ) alert(' choose participants ');
+                else {
+                  addMeet(selectedTimeBlock, people);
+                  newMeetWindowShow();
+                  setMeetingRoom("");
+                }
+              } else {
+                alert("choose meet room")
+              }
             }}
           >
             {"Create"}
           </button> {/* TODO: pass number of time block by time and meeting room */}
           <div className="invited-people">
             {/*{people.map( el => (<div className="invated-people__participant">{el.name}</div>))}*/}
-            {Object.keys(this.state.people).map((keyName, i) => (
+            {Object.keys(people).map((keyName, i) => (
                 <div className="invited-people__participant" key={i}>
                     {/*<span className="input-label">key: {i} Name: {subjects[keyName]}</span>*/}
-                    {this.state.people[keyName].name}
+                    {people[keyName].name}
                 </div>
             ))}
           </div>
           </div>
-        </form>
+        </div>
     )
   }
 }

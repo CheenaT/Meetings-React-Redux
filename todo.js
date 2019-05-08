@@ -20,6 +20,15 @@
 
 Add cursor styles
 dynamic possible time
+highlighting column and row on select timeblock
+mb add scroll to possible time list
+edit meet button
+add guest from input
+prevent mouseover after choosing Lomonosov meet room
+i18n
+delete meet
+delete guest
+
 
 notes: meetingRoomIsSelected, recommendedMeetingRoom mb needless
 fix current time vertical line

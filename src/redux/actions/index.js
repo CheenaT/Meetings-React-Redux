@@ -1,8 +1,7 @@
-export const addMeet = id => ({
+export const addMeet = (id, people) => ({
   type: 'ADD_MEET',
-  payload: {
-    id
-  }
+  id,
+  people
 });
 
 export const setSelectedTimeBlock = id => ({

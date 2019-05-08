@@ -35,6 +35,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   height: 20px;
   border-width: thin;
 }
+ul {
+  list-style: none;
+}
 .header {
   font-family: "Playfair Display", "Libre Baskerville", "Arimo",
     "Open Sans Condensed", sans-serif;
@@ -107,7 +110,7 @@ span + span {
   position: absolute;
   width: 19.1%;
   height: 24px;
-  line-height: 24px;
+  line-height: 20px;
   text-align: center;
   top: 11px;
   color: #fff;
@@ -245,7 +248,7 @@ progress {
 }
 .date-picker__arrows {
   display: inline-block;
-  width: 24px;
+  width: 20px;
 }
 .date-picker__right-arrow {
   position: absolute;
@@ -481,6 +484,9 @@ progress {
     border-radius: 50%;
     top: 7px;
   }
+  .meet-people-list__added {
+    color: #1772C3;
+  }
   .meet-people-list__hint {
     text-align: center;
     font-size: 14px;
@@ -492,7 +498,7 @@ progress {
 }
 .new-meet-create__recommended-meeting-rooms-text {
   position: absolute;
-  width: 200px;
+  width: 420px;
   left: 660px;
   top: 175px;
 }
@@ -508,10 +514,15 @@ progress {
   background: #00BACE; // mb #00D6AD or #0098D9
   color: #000;
 }
-.new-meet-create__meet-room {
+.new-meet-create__meet-rooms {
   position: relative;
   left: 660px;
   top: 163px;
+  .new-meet-create__selected-meeting-room + & {
+    margin-top: 8px;
+  }
+}
+.new-meet-create__meet-room {
   width: 420px;
   height: 37px;
   line-height: 37px;
@@ -616,7 +627,7 @@ input[type="time"]::-webkit-outer-spin-button {
   background: #fff;
   border-radius: 4px 4px 0 0;
   height: 117px;
-  left: 1004px;
+  left: 1008px;
   top: 3px;
   list-style: none;
   li {
@@ -637,7 +648,7 @@ input[type="time"]::-webkit-outer-spin-button {
 .new-meet-create__label-date-end {
   position: absolute;
   display: block;
-  left: 1004px;
+  left: 1008px;
   top: 97px;
 }
 .new-meet-create__hint {
@@ -660,10 +671,10 @@ input[type="time"]::-webkit-outer-spin-button {
 }
 .invited-people {
   position: absolute;
-  left: 204px;
-  top: 250px;
+  left: 1116px;
+  top: 200px;
   width: 420px;
-  height: 300px;
+  height: 352px;
 }
 .invited-people__participant {
   position: relative;
@@ -704,7 +715,7 @@ input[type="time"]::-webkit-outer-spin-button {
   text-align: center;
   border-radius: 6px;
   padding: 8px 0;
-  z-index: 1;
+  z-index: 2;
   // -webkit-animation: fadeIn 1s;
   animation: fadeIn 1s;
   // left: 50%;
@@ -719,8 +730,11 @@ input[type="time"]::-webkit-outer-spin-button {
   text-align: center;
   border-radius: 6px;
   padding: 8px 0;
-  z-index: 1;
+  z-index: 2;
   animation: fadeIn 1s;
+  & > .popup__close-button {
+    left: 160px;
+  }
 }
 .popup__close-button {
   position: absolute;
@@ -811,7 +825,23 @@ input[type="time"]::-webkit-outer-spin-button {
   position: relative;
   bottom: 29px;
   width: 75px;
-  height: 28px;
+  height: 29px;
   // background: black;
-
+  text-align: center;
+  font-size: 14px;
+  color: white;
+  line-height: 28px;
+  white-space: nowrap;
+  padding-left: 10px;
+  font-family: "Poppins";
+  font-size: 13px;
+  z-index: 1;
+}
+.plus-box__image {
+  position: absolute;
+  left: 2.5px;
+  top: 2.5px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
 }

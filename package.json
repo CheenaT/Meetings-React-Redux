@@ -5,6 +5,7 @@
   "homepage": "https://cheenat.github.io/Meetings-React-Redux/",
   "dependencies": {
     "formik": "^1.5.2",
+    "lodash": "^4.17.11",
     "node-sass": "^4.11.0",
     "react": "^16.8.6",
     "react-datepicker": "^2.4.0",
@@ -30,5 +31,11 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "devDependencies": {
+    "babel-jest": "^24.8.0",
+    "enzyme": "^3.9.0",
+    "gh-pages": "^2.0.1",
+    "jest": "^24.8.0"
+  }
 }

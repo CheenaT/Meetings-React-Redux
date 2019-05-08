@@ -13,56 +13,56 @@ export const participants = [
   },
   {
     id: 1,
-    name: "Darth Vader",
-    about: " • Supreme commander of the Galactic Empire • last floor",
+    name: "Vincent Vega",
+    about: " • hitman • 2 floor",
     image: "./../../images/Anakin.jpg"
   },
   {
     id: 1,
-    name: "Darth Vader",
-    about: " • Supreme commander of the Galactic Empire • last floor",
+    name: "Elon Musk",
+    about: " • co-founder, CEO and designer at Tesla and SpaceX • 28",
     image: "./../../images/Anakin.jpg"
   },
   {
     id: 1,
-    name: "Darth Vader",
-    about: " • Supreme commander of the Galactic Empire • last floor",
+    name: "Neo",
+    about: " • The One, ex-software engineer in our Matrix simulation • any floor",
     image: "./../../images/Anakin.jpg"
   },
   {
     id: 1,
-    name: "Darth Vader",
-    about: " • Supreme commander of the Galactic Empire • last floor",
+    name: "Yagami Light",
+    about: " • God of the new world, also known as justice • 28 floor",
     image: "./../../images/Anakin.jpg"
   },
   {
     id: 2,
-    name: "Darth Vader",
-    about: " • Supreme commander of the Galactic Empire • last floor",
+    name: "Eru Rōraito also known as L",
+    about: " • world-renowned detective • 31 floor",
     image: "./../../images/Anakin.jpg"
   },
   {
     id: 1,
-    name: "Darth Vader",
-    about: " • Supreme commander of the Galactic Empire • last floor",
+    name: "Erald Coil",
+    about: " • second most famous detective in the world • 31 floor",
     image: "./../../images/Anakin.jpg"
   },
   {
     id: 1,
-    name: "Darth Vader",
-    about: " • Supreme commander of the Galactic Empire • last floor",
+    name: "Deneuve",
+    about: " • third most famous detective in the world • 31 floor",
     image: "./../../images/Anakin.jpg"
   },
   {
     id: 1,
-    name: "Darth Vader",
-    about: " • Supreme commander of the Galactic Empire • last floor",
+    name: "Mark Lilly",
+    about: " • social worker • last floor",
     image: "./../../images/Anakin.jpg"
   },
   {
     id: 1,
-    name: "Darth Vader",
-    about: " • Supreme commander of the Galactic Empire • last floor",
+    name: "N'aix",
+    about: " • main damage dealer • last floor",
     image: "./../../images/Anakin.jpg"
   },
   {
