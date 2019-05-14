@@ -8,6 +8,7 @@ import { connect } from 'react-redux';
 import { addMeet, newMeetWindowShow, setMeetingRoom, findingParticipantChange } from '../../redux/actions';
 import { bindActionCreators } from 'redux';
 import isEmpty from 'lodash/isEmpty';
+import omit from 'lodash/omit';
 
 let qa =document.querySelectorAll.bind(document);
 
@@ -39,7 +40,7 @@ class CreateNewMeetField extends React.Component {
     if ( 30 < mins && mins < 480 ) {
       this.setState({ beginTimeValue: new Date(new Date(Math.ceil(new Date().getTime() / (60*1000*5) ) * 60*1000*5).setHours(8,0)) });
     }
-    if ( 30 < endTimeMins && endTimeMins < 480 ) {
+    if ( 60 < endTimeMins && endTimeMins < 480 ) {
       this.setState({ endTimeValue: new Date(new Date().setHours(8,30)) });
     }
     const { timeBlocksR: { selectedMeetingRoom } } = this.props;
@@ -54,7 +55,7 @@ class CreateNewMeetField extends React.Component {
     if ( 30 < mins && mins < 480 ) {
       this.setState({ beginTimeValue: new Date(new Date(Math.ceil(new Date().getTime() / (60*1000*5) ) * 60*1000*5).setHours(8,0)) });
     }
-    if ( 30 < endTimeMins && endTimeMins < 480 ) {
+    if ( 60 < endTimeMins && endTimeMins < 480 ) {
       this.setState({ endTimeValue: new Date(new Date().setHours(8,30)) });
     }
   }
@@ -92,9 +93,9 @@ class CreateNewMeetField extends React.Component {
       // rmrs.filter( (el, i) => !tbs[ hours - 8 + 17 * i ] )
   }
   addParticipant = (e, name, i) => {
-    let newPeople = {...this.state.people, [name]: { name, image: i } }; // change 1 to id
+    let newPeople = {...this.state.people, [name]: { name, image: i, isHover: false } }; // change 1 to id
     this.setState({people: newPeople });
-    console.log(' addParticipant : ', e, name, newPeople, this.state.people);
+    console.log(' addParticipant : ', e, name.split(' ').join('_'), newPeople, this.state.people);
   }
   render() {
     const { timeBlocksR: { findingParticipant, selectedMeetingRoom, selectedTimeBlock }, newMeetWindowShow, findingParticipantChange, setMeetingRoom, addMeet } = this.props,
@@ -154,7 +155,7 @@ class CreateNewMeetField extends React.Component {
                  console.log(' debug innerText : ', e.target.innerText, new Date().setHours(e.target.innerText.slice(0,2),
                  e.target.innerText.slice(3,5) ), hours, mins, new Date(new Date().setHours(hours, mins + 30)) );
                  this.setState({ beginTimeValue: new Date(new Date().setHours(hours, mins)), endTimeValue: new Date(new Date().setHours(hours, mins + 30)), possibleTimeShown: false });
-                 setTimeout( () => this.hoverMeetingRoom(), 0)
+                 // setTimeout( () => this.hoverMeetingRoom(), 0)
                } }
               className="new-meet-create__possible-time" >
               {Array.apply(null, { length: 5 }).map((el, i) => {
@@ -350,7 +351,7 @@ class CreateNewMeetField extends React.Component {
             )
           }
           {
-            !selectedMeetingRoom && <div className="new-meet-create__selected-meeting-room" >{"Сhoose meeting room"}</div>
+            !selectedMeetingRoom && <div className="new-meet-create__selected-meeting-room" >Choose meeting room</div>
           }
             {console.log(' debug condition : ', selectedMeetingRoom, !!selectedMeetingRoom, meetingRoomIsHover, !!meetingRoomIsHover, selectedMeetingRoom && meetingRoomIsHover )}
           <ul
@@ -403,9 +404,33 @@ class CreateNewMeetField extends React.Component {
           <div className="invited-people">
             {/*{people.map( el => (<div className="invated-people__participant">{el.name}</div>))}*/}
             {Object.keys(people).map((keyName, i) => (
-                <div className="invited-people__participant" key={i}>
+                <div
+                  className="invited-people__participant"
+                  key={i}
+                  onMouseOver={() => this.setState({people: {...people, [keyName]: {...people[keyName], isHover: true } } }) }
+                  onMouseLeave={() => this.setState({people: {...people, [keyName]: {...people[keyName], isHover: false } } }) }
+                >
                     {/*<span className="input-label">key: {i} Name: {subjects[keyName]}</span>*/}
-                    {people[keyName].name}
+                    <img
+                      src={images[people[keyName].image]} width="24px" height="24px" className="participants__avatar" alt=""/>
+                    <div className="participants__name">{people[keyName].name}</div>
+                    {
+                      people[keyName].isHover && (
+                        <img
+                          src={images[37]}
+                          width="24px"
+                          height="24px"
+                          className="participants__close-button"
+                          alt=""
+                          onClick={() => {
+                              const newPeople = omit(people, keyName);
+                              console.log(" debug delete participant : ", keyName, newPeople);
+                              this.setState({ people: newPeople });
+                            }
+                          }
+                        />
+                      )
+                    }
                 </div>
             ))}
           </div>

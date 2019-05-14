@@ -19,15 +19,16 @@
 17. Add background participants people onHover!8
 
 Add cursor styles
-dynamic possible time
-highlighting column and row on select timeblock
 mb add scroll to possible time list
 edit meet button
 add guest from input
-prevent mouseover after choosing Lomonosov meet room
 i18n
 delete meet
 delete guest
+
+prevent mouseover after choosing Lomonosov meet room!solved with one more row with notation
+highlighting column and row on select timeblock!
+dynamic possible time!
 
 
 notes: meetingRoomIsSelected, recommendedMeetingRoom mb needless

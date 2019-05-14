@@ -67,14 +67,14 @@ export const participants = [
   },
   {
     id: 2,
-    name: "Darth Vader",
-    about: " • Supreme commander of the Galactic Empire • last floor",
+    name: "Saitama",
+    about: " • as of now, is potentially the most powerful being to exist • floor not found",
     image: "./../../images/Anakin.jpg"
   },
   {
     id: 1,
-    name: "Darth Vader",
-    about: " • Supreme commander of the Galactic Empire • last floor",
+    name: "Anton Chigurh",
+    about: " • psychopathic killer who is devoid of conscience, remorse and compassion • 1 floor",
     image: "./../../images/Anakin.jpg"
   },
   {

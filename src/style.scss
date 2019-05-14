@@ -678,8 +678,25 @@ input[type="time"]::-webkit-outer-spin-button {
 }
 .invited-people__participant {
   position: relative;
-  margin-left: 20px;
+  width: 178px;
   display: inline-block;
+}
+.participants__avatar {
+  position: relative;
+  margin-right: 8px;
+  // display: none;
+  border-radius: 50%;
+  top: 7px;
+}
+.participants__name {
+  display: inline-block;
+  height: 24px;
+  vertical-align: middle;
+}
+.participants__close-button {
+  position: absolute;
+  margin-right: 8px;
+  top: 7px;
 }
 .meeting-rooms__floor {
   margin-top: 22px; // 24 to next
@@ -830,7 +847,7 @@ input[type="time"]::-webkit-outer-spin-button {
   text-align: center;
   font-size: 14px;
   color: white;
-  line-height: 28px;
+  line-height: 30px;
   white-space: nowrap;
   padding-left: 10px;
   font-family: "Poppins";
