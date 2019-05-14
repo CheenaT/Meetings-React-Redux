@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/Meetings-React-Redux/precache-manifest.a5cbb318d79aaac0484526d37f83510c.js"
+  "/Meetings-React-Redux/precache-manifest.34e092d241ff068e037c44e6e3d54765.js"
 );
 
 workbox.clientsClaim();
