@@ -53,11 +53,7 @@ class Meetings extends Component {
         img.setAttribute('class', 'plus-box__image');
         // q(`.plus${i}`).innerHTML = first.split(' ')[1] ? first.split(' ')[1] : first.split(' ')[0];
         let name = document.createElement("div");
-        name.style.position = "relative";
-        name.style.left = "6.5px";
-        name.style.fontFamily = "Poppins";
-        name.style.fontSize = "13px";
-        name.style.width = "59px";
+        name.setAttribute('class', 'plus-box__time-block-avatar');
         name.innerText = first.split(' ')[1] ? first.split(' ')[1] : first.split(' ')[0];
         q(`.plus${i}`).appendChild(name);
         q(`.plus${i}`).appendChild(img);
@@ -183,6 +179,7 @@ class Meetings extends Component {
     let i = 0;
     return (
       <div className="basicLayout">
+        <div style={{width: '100%', height: '20px', background: '#00BACE', fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif', textAlign: 'center'}}>New version of this webpage here! <a href="https://cheenat.github.io/Meetings-React-MobX/">Meetings-React-MobX</a></div>
         <header className="header">
           <img
             className="header__gp-icon"

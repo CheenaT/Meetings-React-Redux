@@ -49,15 +49,22 @@ class CreateNewMeetField extends React.Component {
     }
   }
   componentDidUpdate() {
-    const { beginTimeValue, endTimeValue } = this.state,
-            mins = beginTimeValue.getHours() * 60 + beginTimeValue.getMinutes(),
-            endTimeMins = endTimeValue.getHours() * 60 + +endTimeValue.getMinutes();
+    const { beginTimeValue, endTimeValue } = this.state;
+    if ( typeof beginTimeValue !== 'object' ) {
+      this.setState({beginTimeValue: new Date(new Date().setHours(beginTimeValue.slice(0,2), beginTimeValue.slice(3,5))) });
+    }
+    if ( typeof endTimeValue !== 'object' ) {
+      this.setState({endTimeValue: new Date(new Date().setHours(endTimeValue.slice(0,2), endTimeValue.slice(3,5))) });
+    }
+    const mins = beginTimeValue.getHours() * 60 + beginTimeValue.getMinutes(),
+          endTimeMins = endTimeValue.getHours() * 60 + +endTimeValue.getMinutes();
     if ( 30 < mins && mins < 480 ) {
       this.setState({ beginTimeValue: new Date(new Date(Math.ceil(new Date().getTime() / (60*1000*5) ) * 60*1000*5).setHours(8,0)) });
     }
     if ( 60 < endTimeMins && endTimeMins < 480 ) {
       this.setState({ endTimeValue: new Date(new Date().setHours(8,30)) });
     }
+    console.log(' debug beginTimeValue sdfsdfsdfsdf : ', beginTimeValue.toTimeString().slice(0,5) )
   }
   componentWillUnmount() {
     clearInterval(this.timerID);
@@ -72,7 +79,7 @@ class CreateNewMeetField extends React.Component {
     let regexTimeFormat =/^(0[0-9]|1[0-9]|2[0-3]|[0-9]):[0-5][0-9]$/;
     console.log(' number debug : ', regexTimeFormat.test(e.target.value), e.target.value, typeof e.target.value );
     if ( regexTimeFormat.test(e.target.value) ) {
-      this.setState({ beginTimeValue: e.target.value });
+      this.setState({ beginTimeValue: new Date(new Date().setHours(e.target.value.slice(0,2), e.target.value.slice(3,5))) });
     }
   }
   hoverMeetingRoom = (e, i) => {
@@ -270,7 +277,7 @@ class CreateNewMeetField extends React.Component {
           <input
             className="new-meet-create__time"
             type='time'
-            onChange={ e => this.setState({ endTimeValue: e.target.value }) }
+            onChange={ e => this.setState({ endTimeValue: new Date(new Date().setHours(e.target.value.slice(0,2), e.target.value.slice(3,5))) }) }
             value={ endTimeValue.toTimeString().slice(0,5) }
             onMouseOver={ () => this.setState({ possibleEndTimeShown: 1 }) }
             onMouseOut={ () => { setTimeout( () => { if (this.state.possibleEndTimeShown === 1) { this.setState({ possibleEndTimeShown: false }) } }, 200) } }

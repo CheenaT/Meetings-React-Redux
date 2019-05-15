@@ -25,7 +25,9 @@ add guest from input
 i18n
 delete meet
 delete guest
+mb add router
 
+!!!Fix "TypeError: beginTime.toTimeString is not a function"!
 prevent mouseover after choosing Lomonosov meet room!solved with one more row with notation
 highlighting column and row on select timeblock!
 dynamic possible time!
