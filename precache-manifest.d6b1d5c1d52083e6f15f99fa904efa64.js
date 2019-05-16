@@ -1,10 +1,10 @@
 self.__precacheManifest = [
   {
-    "revision": "b021559bb6547cd56933",
-    "url": "/Meetings-React-Redux/static/css/main.7935a31b.chunk.css"
+    "revision": "c320473893021a1a5021",
+    "url": "/Meetings-React-Redux/static/css/main.f16b39f2.chunk.css"
   },
   {
-    "revision": "b021559bb6547cd56933",
+    "revision": "c320473893021a1a5021",
     "url": "/Meetings-React-Redux/static/js/main.f28d5426.chunk.js"
   },
   {
@@ -188,7 +188,7 @@ self.__precacheManifest = [
     "url": "/Meetings-React-Redux/static/media/logo.774e34d9.svg"
   },
   {
-    "revision": "f18573e8fb3c9be42a81d787b248c74b",
+    "revision": "09714f16706e5c720ffcde176c83aa1a",
     "url": "/Meetings-React-Redux/index.html"
   }
 ];
