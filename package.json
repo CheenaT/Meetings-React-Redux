@@ -5,7 +5,7 @@
   "homepage": "https://cheenat.github.io/Meetings-React-Redux/",
   "dependencies": {
     "formik": "^1.5.2",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.21",
     "node-sass": "^4.11.0",
     "react": "^16.8.6",
     "react-datepicker": "^2.4.0",
